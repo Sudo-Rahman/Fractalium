@@ -6,9 +6,9 @@
 
 using namespace Fractalium;
 
-const int Fractal::ITERATIONS = 50;
+const int Fractal::ITERATIONS = 10000;
 
-std::pair<Double , Double> Fractal::_left_corner = {-2.5, -2.0};
+std::pair<Double , Double> Fractal::_offset = {-2.1, -2};
 
 int Mandelbrot::pointCheck(const Complex &point, int iterations) const
 {
@@ -18,9 +18,7 @@ int Mandelbrot::pointCheck(const Complex &point, int iterations) const
     {
         z = z * z + point;
         if (z.pointRadius() > 2.0)
-        {
             break;
-        }
     }
     return i;
 }
@@ -33,9 +31,7 @@ int Fractalium::Julia::pointCheck(const Complex &point, int iterations) const
     {
         z = z * z + juliaConstant;
         if (z.pointRadius() > 2.0)
-        {
             break;
-        }
     }
     return i;
 }

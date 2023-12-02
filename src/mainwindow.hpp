@@ -20,9 +20,10 @@ class MainWindow : public QMainWindow {
     Fractalium::FractalWidget *label;
 
     std::vector<QColor> _color_map;
-    int DISPLAY_SIZE = 200;
+    int DISPLAY_SIZE = 400;
 
-    Fractalium::Double _step_coord = 2.0 / Fractalium::Double(DISPLAY_SIZE);
+
+    Fractalium::Double _step_coord = 4.0 / Fractalium::Double(DISPLAY_SIZE);
 
     Fractalium::Fractal *fractal;
 

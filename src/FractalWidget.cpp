@@ -48,7 +48,6 @@ void FractalWidget::mouseMoveEvent(QMouseEvent *event)
         return;
     _rubber_band->setGeometry(QRect(_start_point, event->pos()).normalized());
     _rubber_band->show();
-    qDebug() << event->pos();
 }
 
 void FractalWidget::back()

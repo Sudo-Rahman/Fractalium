@@ -1,10 +1,15 @@
 #include <QRubberBand>
 #include "mainwindow.hpp"
 #include <iostream>
+#include <chrono>
 
 using std::min;
 using std::max;
 
+struct color
+{
+    int r, g, b;
+};
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -14,18 +19,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     label = new Fractalium::FractalWidget(central);
     label->setAlignment(Qt::AlignCenter);
-    label->setMinimumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
-    label->setMaximumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
+    label->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    label->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
-    this->setMinimumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
-    this->setMaximumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
+    this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
 
-    _color_map.resize(Fractalium::Fractal::ITERATIONS);
-    _color_map[Fractalium::Fractal::ITERATIONS - 1] = QColor::fromHsl(0, 0, 0).name();
-    for (int i = 0, j = 0; j < Fractalium::Fractal::ITERATIONS - 1; i++, ++j)
-        _color_map[j] = (i <= DISPLAY_SIZE) ? QColor::fromHsl(i, 200, 148).name() : _color_map[j - 1];
 
+    auto get_color = [](const int &i) -> color
+    {
+        color c{};
+        c.r = i;
+        c.g = 255;
+        c.b = 229;
+        return c;
+    };
+
+    _color_map = std::vector<QColor>(Fractalium::Fractal::ITERATIONS);
+
+    color c{};
+    for (int i = 0;i < Fractalium::Fractal::ITERATIONS ; i++)
+    {
+        c = get_color(i%255);
+        _color_map[i]=QColor::fromHsl(c.r, c.g, c.b).name();
+    }
+    _color_map.emplace_back(QColor::fromRgb(0, 0, 0).name());
     image = new QImage(label->width(), label->height(), QImage::Format_RGB32);
 
     setupUi();
@@ -36,36 +55,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 void MainWindow::paintFractal()
 {
-    for (int i = -label->width() / 2; i <= label->width() / 2; ++i)
+    int q;
+    for (int i = 0; i < label->width(); ++i)
     {
-        for (int j = -label->height() / 2; j <= label->height() / 2; ++j)
+        for (int j = 0; j < label->height(); ++j)
         {
             Fractalium::Complex point = Fractalium::Complex(
-                    (i + label->width() / 2) * _step_coord + Fractalium::Fractal::_left_corner.first,
-                    (label->height() / 2 - j) * _step_coord + Fractalium::Fractal::_left_corner.second);
-            int q = fractal->pointCheck(point, Fractalium::Fractal::ITERATIONS);
-            image->setPixelColor(i + label->width() / 2, label->height() / 2 - j, _color_map[q].toRgb());
+                    Fractalium::Fractal::_offset.first + i * _step_coord,
+                    Fractalium::Fractal::_offset.second + j * _step_coord
+            );
+            q = fractal->pointCheck(point, Fractalium::Fractal::ITERATIONS);
+            image->setPixelColor(i, j, _color_map[q]);
         }
     }
     label->setFractal(*image);
 }
 
+/**
+ * @brief quand on selectionne une zone de l'image
+ * @param start
+ * @param end
+ */
 void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 {
 
-    Fractalium::Fractal::_left_corner.first =
-            min(end.x(), start.x()) * _step_coord + Fractalium::Fractal::_left_corner.first;
-    Fractalium::Fractal::_left_corner.second =
-            (max(label->width(), label->height()) -
-            max(end.y(),start.y())) * _step_coord + Fractalium::Fractal::_left_corner.second;
+    // on calcule le nouveau offset x
+    Fractalium::Fractal::_offset.first =
+            Fractalium::Fractal::_offset.first + start.x() * _step_coord;
+    // on calcule le nouveau offset y
+    Fractalium::Fractal::_offset.second =
+            Fractalium::Fractal::_offset.second + start.y() * _step_coord;
 
-    std::cout << Fractalium::Fractal::_left_corner.first << "  " << Fractalium::Fractal::_left_corner.second << "  " <<_step_coord
-              << std::endl;
-
+    // on calcule le nouveau step_coord
     int xDelta = end.x() - start.x(), yDelta = abs(end.y() - start.y());
     _step_coord = double(max(xDelta, yDelta)) / max(label->width(), label->height()) * _step_coord;
-
-    std::cout << _step_coord << std::endl;
 
     paintFractal();
 }

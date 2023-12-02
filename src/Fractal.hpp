@@ -19,7 +19,7 @@ namespace Fractalium
 
         static const int ITERATIONS;
 
-        static std::pair<Double, Double> _left_corner;
+        static std::pair<Double, Double> _offset;
     };
 
     class Mandelbrot : public Fractal {
