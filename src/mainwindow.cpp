@@ -1,118 +1,107 @@
 #include <QRubberBand>
-#include "mainwindow.h"
-#include "Fractal.hpp"
-#include "Contantes.hpp"
+#include "mainwindow.hpp"
 #include <iostream>
 
 using std::min;
 using std::max;
 
-bool rubberBandSelection = false;
-
-QRubberBand *rubberBand;
-QImage *image;
-
-QColor colorMap[ITERATIONS];
-static QPoint startPoint, releasePoint;
-
-Fractal *fractal;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     auto *central = new QWidget(this);
     this->setCentralWidget(central);
+
+
+    label = new Fractalium::FractalWidget(central);
+    label->setAlignment(Qt::AlignCenter);
+    label->setMinimumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
+    label->setMaximumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
 
     this->setMinimumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
     this->setMaximumSize(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1);
 
-    fractal = new Mandelbrot();
 
-    for (int i = 0, j = 0; j <= ITERATIONS; i += 3, ++j)
-        colorMap[j] = (i <= DISPLAY_SIZE) ? QColor::fromHsl(i, 200, 148).name() : colorMap[j - 1];
+    _color_map.resize(Fractalium::Fractal::ITERATIONS);
+    _color_map[Fractalium::Fractal::ITERATIONS - 1] = QColor::fromHsl(0, 0, 0).name();
+    for (int i = 0, j = 0; j < Fractalium::Fractal::ITERATIONS - 1; i++, ++j)
+        _color_map[j] = (i <= DISPLAY_SIZE) ? QColor::fromHsl(i, 200, 148).name() : _color_map[j - 1];
 
-    image = new QImage(2 * DISPLAY_SIZE + 1, 2 * DISPLAY_SIZE + 1, QImage::Format_RGB32);
+    image = new QImage(label->width(), label->height(), QImage::Format_RGB32);
+
+    setupUi();
+
+    connect(label, &Fractalium::FractalWidget::newSelection, this, &MainWindow::newSelection);
 }
 
-// ... (previous code remains unchanged)
 
-void MainWindow::mousePressEvent(QMouseEvent *event)
+void MainWindow::paintFractal()
 {
-    rubberBandSelection = true;
-    startPoint = event->pos();
-}
-
-void MainWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    if (!rubberBandSelection)
-        return;
-    rubberBand->setGeometry(QRect(startPoint, event->pos()).normalized());
-    rubberBand->show();
-    if (event->pos().x() < 0
-        || event->pos().y() < 0
-        || event->pos().x() > 2 * DISPLAY_SIZE
-        || event->pos().y() > 2 * DISPLAY_SIZE)
-        return;
-    releasePoint = event->pos();
-    repaint();
-}
-
-void MainWindow::mouseReleaseEvent(QMouseEvent *event)
-{
-    rubberBandSelection = false;
-    rubberBand->hide();
-
-    if (!(event->pos().x() < 0
-          || event->pos().y() < 0
-          || event->pos().x() > 2 * DISPLAY_SIZE
-          || event->pos().y() > 2 * DISPLAY_SIZE))
-        releasePoint = event->pos();
-
-    int xDelta = releasePoint.x() - startPoint.x(), yDelta;
-    if (xDelta > 0)
+    for (int i = -label->width() / 2; i <= label->width() / 2; ++i)
     {
-        yDelta = abs(releasePoint.y() - startPoint.y());
-        if (yDelta != 0)
+        for (int j = -label->height() / 2; j <= label->height() / 2; ++j)
         {
-            leftCorner.first = double(min(releasePoint.x(), startPoint.x())) * STEP_COORD + leftCorner.first;
-            leftCorner.second = double(2.0 * DISPLAY_SIZE - max(releasePoint.y(),
-                                                                startPoint.y())) * STEP_COORD + leftCorner.second;
-            STEP_COORD = double(max(xDelta, yDelta)) / (2.0 * double(DISPLAY_SIZE)) * STEP_COORD;
-            repaint();
+            Fractalium::Complex point = Fractalium::Complex(
+                    (i + label->width() / 2) * _step_coord + Fractalium::Fractal::_left_corner.first,
+                    (label->height() / 2 - j) * _step_coord + Fractalium::Fractal::_left_corner.second);
+            int q = fractal->pointCheck(point, Fractalium::Fractal::ITERATIONS);
+            image->setPixelColor(i + label->width() / 2, label->height() / 2 - j, _color_map[q].toRgb());
         }
     }
-    else if (xDelta < 0)
-    {
-        yDelta = abs(releasePoint.y() - startPoint.y());
-        if (yDelta != 0)
-        {
-            STEP_COORD = (2.0 * double(DISPLAY_SIZE)) / double(max(xDelta, yDelta)) * STEP_COORD;
-            leftCorner.first -= double(min(releasePoint.x(), startPoint.x())) * STEP_COORD;
-            leftCorner.second -= double(2.0 * DISPLAY_SIZE - max(releasePoint.y(), startPoint.y())) * STEP_COORD;
-            repaint();
-        }
-    }
+    label->setFractal(*image);
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 {
-    QPainter painter(this);
-    painter.translate(DISPLAY_SIZE, DISPLAY_SIZE);
-    painter.scale(1, -1);
-    if (rubberBandSelection)
+
+    Fractalium::Fractal::_left_corner.first =
+            min(end.x(), start.x()) * _step_coord + Fractalium::Fractal::_left_corner.first;
+    Fractalium::Fractal::_left_corner.second =
+            (max(label->width(), label->height()) -
+            max(end.y(),start.y())) * _step_coord + Fractalium::Fractal::_left_corner.second;
+
+    std::cout << Fractalium::Fractal::_left_corner.first << "  " << Fractalium::Fractal::_left_corner.second << "  " <<_step_coord
+              << std::endl;
+
+    int xDelta = end.x() - start.x(), yDelta = abs(end.y() - start.y());
+    _step_coord = double(max(xDelta, yDelta)) / max(label->width(), label->height()) * _step_coord;
+
+    std::cout << _step_coord << std::endl;
+
+    paintFractal();
+}
+
+void MainWindow::setupUi()
+{
+
+    _menu_bar = new QMenuBar(this);
+    this->setMenuBar(_menu_bar);
+
+    auto *menu = new QMenu("Fractal", _menu_bar);
+    _menu_bar->addMenu(menu);
+
+    auto *action = new QAction("Mandelbrot", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
     {
-        painter.drawImage(QPoint(-DISPLAY_SIZE, -DISPLAY_SIZE), *image);
-        return;
-    }
-    for (int i = -DISPLAY_SIZE; i <= DISPLAY_SIZE; ++i)
+        fractal = new Fractalium::Mandelbrot();
+        paintFractal();
+    });
+
+    action = new QAction("Julia", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
     {
-        for (int j = -DISPLAY_SIZE; j <= DISPLAY_SIZE; ++j)
-        {
-            Complex point = Complex((i + DISPLAY_SIZE) * STEP_COORD + leftCorner.first,
-                                    (DISPLAY_SIZE - j) * STEP_COORD + leftCorner.second);
-            int q = fractal->pointCheck(point, ITERATIONS);
-            image->setPixelColor(i + DISPLAY_SIZE, DISPLAY_SIZE - j, colorMap[q].toRgb());
-        }
-    }
-    painter.drawImage(QPoint(-DISPLAY_SIZE, -DISPLAY_SIZE), *image);
+        fractal = new Fractalium::Julia();
+        paintFractal();
+    });
+
+    auto *menu2 = new QMenu("History", _menu_bar);
+    _menu_bar->addMenu(menu2);
+
+    action = new QAction("Back", menu2);
+    menu2->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
+    {
+        label->back();
+    });
 }

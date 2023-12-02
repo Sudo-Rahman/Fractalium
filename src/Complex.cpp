@@ -1,5 +1,7 @@
 #include "Complex.hpp"
 
+using namespace Fractalium;
+
 Complex::Complex(Double r, Double i)
 {
     this->real = std::move(r);

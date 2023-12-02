@@ -22,6 +22,8 @@ file(GLOB_RECURSE SRC
         src*.hpp
 )
 
+include_directories(src)
+
 add_executable(Fractalium ${SRC} main.cpp)
 
 target_compile_options(Fractalium PRIVATE -O3)

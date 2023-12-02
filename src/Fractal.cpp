@@ -4,6 +4,12 @@
 
 #include "Fractal.hpp"
 
+using namespace Fractalium;
+
+const int Fractal::ITERATIONS = 50;
+
+std::pair<Double , Double> Fractal::_left_corner = {-2.5, -2.0};
+
 int Mandelbrot::pointCheck(const Complex &point, int iterations) const
 {
     int i;
@@ -19,7 +25,7 @@ int Mandelbrot::pointCheck(const Complex &point, int iterations) const
     return i;
 }
 
-int Julia::pointCheck(const Complex &point, int iterations) const
+int Fractalium::Julia::pointCheck(const Complex &point, int iterations) const
 {
     Complex z = point;
     int i;
