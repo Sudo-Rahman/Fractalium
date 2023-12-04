@@ -26,6 +26,7 @@ architecture distribuée.
 
 - C++
 - Boost
+- Boost MPI
 - MPI
 - Git
 
@@ -81,6 +82,7 @@ a distributed architecture.
 
 - C++
 - Boost
+- Boost MPI
 - MPI
 - Git
 
