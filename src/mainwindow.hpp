@@ -37,6 +37,19 @@ private:
     void newSelection(const QPoint &start, const QPoint &end);
 
     void setupUi();
+
+protected:
+    bool event(QEvent *event) override;
+};
+
+class PaintFractalEvent : public QEvent {
+public:
+    static const QEvent::Type PaintFractalEventType = static_cast<QEvent::Type>(QEvent::User + 1);
+
+    explicit PaintFractalEvent() : QEvent(PaintFractalEventType)
+    {}
+
+    ~PaintFractalEvent() override = default;
 };
 
 

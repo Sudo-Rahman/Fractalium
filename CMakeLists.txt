@@ -12,7 +12,7 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         REQUIRED)
-find_package(Boost COMPONENTS mpi REQUIRED)
+find_package(Boost COMPONENTS thread mpi REQUIRED)
 
 
 file(GLOB_RECURSE SRC
@@ -30,5 +30,6 @@ target_link_libraries(Fractalium
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Boost::thread
         Boost::mpi
 )

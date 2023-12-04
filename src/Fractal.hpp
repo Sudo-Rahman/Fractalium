@@ -6,6 +6,7 @@
 #define FRACTALIUM_FRACTAL_HPP
 
 #include <Complex.hpp>
+#include <boost/serialization/serialization.hpp>
 
 
 namespace Fractalium
@@ -26,6 +27,16 @@ namespace Fractalium
         static const int ITERATIONS;
 
         static std::pair<Double, Double> _offset;
+
+    private:
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version)
+        {
+            ar & _offset;
+        }
+
     };
 
     class Mandelbrot : public Fractal {

@@ -16,7 +16,6 @@ namespace Fractalium
 
         Complex();
 
-//        = operator overloads
 
         Complex &operator=(Complex const &obj);
 
