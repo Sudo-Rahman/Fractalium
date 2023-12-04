@@ -11,11 +11,17 @@
 namespace Fractalium
 {
 
+    enum class FractalType {
+        Mandelbrot,
+        Julia
+    };
+
     class Fractal {
 
 
     public:
-        [[nodiscard]] virtual int pointCheck(const Complex &pointm, int iterations) const = 0;
+        [[nodiscard]] virtual int pointCheck(const Complex &pointm, int iterations) const
+        { return 0; };
 
         static const int ITERATIONS;
 
@@ -32,7 +38,7 @@ namespace Fractalium
 
         Complex juliaConstant{0.285, 0.01};
     public:
-        explicit Julia(Complex constant) : juliaConstant(std::move(constant))
+        explicit Julia(const Complex& constant) : juliaConstant(constant)
         {}
 
         explicit Julia() = default;

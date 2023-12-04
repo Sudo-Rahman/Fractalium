@@ -14,6 +14,21 @@ Complex::Complex()
     this->imag = 0;
 }
 
+Double Complex::norm() const
+{
+    return sqrt(real * real + imag * imag);
+}
+
+Complex &Complex::operator=(const Complex &obj)
+{
+    if (this != &obj) { // Vérifier l'auto-affectation
+        real = obj.real;
+        imag = obj.imag;
+    }
+    return *this;
+}
+
+
 Complex Complex::operator+(Complex const &obj) const
 {
     return {real + obj.real, imag + obj.imag};
@@ -36,7 +51,26 @@ Complex Complex::operator/(Complex const &obj) const
             (imag * obj.real - real * obj.imag) / (obj.real * obj.real + obj.imag * obj.imag)};
 }
 
-Double Complex::pointRadius() const
+Complex& Complex::operator+=(const Complex &obj)
 {
-    return sqrt(real * real + imag * imag);
+    *this = this->operator+(obj);
+    return *this;
+}
+
+Complex &Complex::operator-=(const Complex &obj)
+{
+    *this = this->operator-(obj);
+    return *this;
+}
+
+Complex& Complex::operator*=(const Complex &obj)
+{
+    *this = this->operator*(obj);
+    return *this;
+}
+
+Complex &Complex::operator/=(const Complex &obj)
+{
+    *this = this->operator/(obj);
+    return *this;
 }

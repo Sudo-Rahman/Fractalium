@@ -3,15 +3,10 @@
 #define FRACTALIUM_COMPLEX_HPP
 
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
-
-using namespace boost::multiprecision;
+#include <Double.hpp>
 
 namespace Fractalium
 {
-
-
-    typedef cpp_dec_float_100 Double;
 
     class Complex {
     public:
@@ -21,6 +16,10 @@ namespace Fractalium
 
         Complex();
 
+//        = operator overloads
+
+        Complex &operator=(Complex const &obj);
+
         Complex operator+(Complex const &obj) const;
 
         Complex operator-(Complex const &obj) const;
@@ -29,7 +28,15 @@ namespace Fractalium
 
         Complex operator/(Complex const &obj) const;
 
-        [[nodiscard]] Double pointRadius() const;
+        Complex &operator+=(Complex const &obj);
+
+        Complex &operator-=(Complex const &obj);
+
+        Complex &operator*=(Complex const &obj);
+
+        Complex &operator/=(Complex const &obj);
+
+        [[nodiscard]] Double norm() const;
     };
 }
 #endif //FRACTALIUM_COMPLEX_HPP

@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
     int DISPLAY_SIZE = 400;
 
 
-    Fractalium::Double _step_coord = 4.0 / Fractalium::Double(DISPLAY_SIZE);
+    Fractalium::Double _step_coord;
 
     Fractalium::Fractal *fractal;
 

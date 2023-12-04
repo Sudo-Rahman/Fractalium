@@ -25,13 +25,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
     this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
+    _step_coord = 4.0 / label->width();
+
 
 
     auto get_color = [](const int &i) -> color
     {
         color c{};
         c.r = i;
-        c.g = 255;
+        c.g = 200;
         c.b = 229;
         return c;
     };
@@ -41,8 +43,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     color c{};
     for (int i = 0;i < Fractalium::Fractal::ITERATIONS ; i++)
     {
-        c = get_color(i%255);
-        _color_map[i]=QColor::fromHsl(c.r, c.g, c.b).name();
+        c = get_color((i*5)%255);
+        _color_map[i]=QColor::fromRgb(c.r, c.g, c.b).name();
     }
     _color_map.emplace_back(QColor::fromRgb(0, 0, 0).name());
     image = new QImage(label->width(), label->height(), QImage::Format_RGB32);
@@ -88,7 +90,7 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 
     // on calcule le nouveau step_coord
     int xDelta = end.x() - start.x(), yDelta = abs(end.y() - start.y());
-    _step_coord = double(max(xDelta, yDelta)) / max(label->width(), label->height()) * _step_coord;
+    _step_coord = min(xDelta, yDelta) * _step_coord;
 
     paintFractal();
 }
@@ -106,7 +108,7 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Mandelbrot();
+        fractal = new Fractalium::Mandelbrot;
         paintFractal();
     });
 
@@ -114,7 +116,7 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Julia();
+        fractal = new Fractalium::Julia;
         paintFractal();
     });
 

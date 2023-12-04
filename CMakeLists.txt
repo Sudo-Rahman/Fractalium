@@ -12,14 +12,13 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         REQUIRED)
-find_package(Boost COMPONENTS system REQUIRED)
-find_package(MPI REQUIRED)
+find_package(Boost COMPONENTS mpi REQUIRED)
 
 
 file(GLOB_RECURSE SRC
         src/*.cpp
-        src*.h
-        src*.hpp
+        src/*.h
+        src/*.hpp
 )
 
 include_directories(src)
@@ -31,6 +30,5 @@ target_link_libraries(Fractalium
         Qt::Core
         Qt::Gui
         Qt::Widgets
-        Boost::system
-        MPI::MPI_CXX
+        Boost::mpi
 )
