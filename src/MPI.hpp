@@ -11,61 +11,107 @@
 #include <Fractal.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <Image.hpp>
+#include <boost/signals2.hpp>
 
 
-namespace Fraclium
+namespace Fractalium
 {
 
     using Fractalium::Double;
 
-    struct MPIStruct {
 
-        std::pair<int, int> start_end_x;
-        std::pair<int, int> start_end_y;
+    class MPIStruct {
 
-        int iterations;
+    public:
+
+        MPIStruct(const MPIStruct &aStruct)
+        {
+            start_x = aStruct.start_x;
+            end_x = aStruct.end_x;
+            start_y = aStruct.start_y;
+            end_y = aStruct.end_y;
+            offset_x = aStruct.offset_x;
+            offset_y = aStruct.offset_y;
+            width = aStruct.width;
+            height = aStruct.height;
+            iterations = aStruct.iterations;
+            step_coord = aStruct.step_coord;
+            fractal = aStruct.fractal;
+        }
+
+        uint16_t start_x;
+        uint16_t end_x;
+
+        uint16_t start_y;
+        uint16_t end_y;
+
+        Double offset_x;
+        Double offset_y;
+
+        uint16_t width;
+        uint16_t height;
+
+        int iterations{};
 
         Double step_coord;
 
-        std::pair<Double, Double> offset;
+        Fractal fractal;
 
-        Fractalium::Fractal fractal;
+        MPIStruct(uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y, Double offset_x, Double offset_y,
+                  uint16_t width, uint16_t height, int iterations, Double step_coord, Fractal fractal) :
+                start_x(start_x), end_x(end_x), start_y(start_y), end_y(end_y), offset_x(offset_x),
+                offset_y(offset_y), width(width), height(height), iterations(iterations), step_coord(step_coord),
+                fractal(fractal)
+        {}
 
-        explicit MPIStruct(int iterations, Double step_coord, std::pair<Double, Double> offset) :
-                iterations(iterations), step_coord(step_coord), offset(offset)
-        {
-            start_end_x = {0, 0};
-            start_end_y = {0, 0};
-        }
 
         MPIStruct() = default;
+
+
+    private:
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version)
+        {
+            ar & start_x;
+            ar & end_x;
+            ar & start_y;
+            ar & end_y;
+            ar & offset_x;
+            ar & offset_y;
+            ar & width;
+            ar & height;
+            ar & iterations;
+            ar & step_coord;
+            ar & fractal;
+        }
+
     };
 
     class MPICalculator {
 
-        MPIStruct _mpi_struct{};
+    public:
+        static boost::signals2::signal<void()> signal;
 
-        int _rank;
+        static MPIStruct mpi_struct;
 
-        boost::thread_group _thread_group;
-
-        boost::asio::io_context _io_context{};
-        boost::asio::executor_work_guard<boost::asio::io_context::executor_type> _work_guard{_io_context.get_executor()};
-
-        explicit MPICalculator(int rank);
-
-        void calculate(MPIStruct mpi_struct);
+        static uint16_t rank;
 
 
-        void threadFunction(int start_x, int end_x, int start_y, int end_y);
+        explicit MPICalculator(uint16_t rank);
 
-        void send();
+        static void calculate(const MPIStruct &mpi_struct, Image &image);
 
-        void receive();
+
+        static void send(const MPIStruct &mpi_struct, Image &image);
+
+        static void receive(Image &image);
 
     public:
 
-        void run();
+        static void run();
     };
 
 }

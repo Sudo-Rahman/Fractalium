@@ -7,59 +7,90 @@
 
 namespace mpi = boost::mpi;
 
+namespace fr = Fractalium;
 
-Fraclium::MPICalculator::MPICalculator(int rank)
+using std::cout;
+using std::endl;
+
+
+Fractalium::MPIStruct Fractalium::MPICalculator::mpi_struct;
+uint16_t Fractalium::MPICalculator::rank = 0;
+
+boost::signals2::signal<void()> Fractalium::MPICalculator::signal;
+
+
+Fractalium::MPICalculator::MPICalculator(uint16_t rank)
 {
-    _rank = rank;
+    MPICalculator::rank = rank;
 }
 
-void Fraclium::MPICalculator::run()
+void Fractalium::MPICalculator::run()
 {
-    _thread_group.create_thread([this]
-                                { return _io_context.run(); });
+
 }
 
 
-void Fraclium::MPICalculator::calculate(MPIStruct mpi_struct)
+void Fractalium::MPICalculator::calculate(const MPIStruct &data, Image &image)
 {
-    boost::asio::post(
-            [this, mpi_struct]
-            {
-                this->_mpi_struct = mpi_struct;
-                uint8_t thread_count = boost::thread::hardware_concurrency();
 
-                int start_x, end_x, range_x;
-                for (int i = 0; i < thread_count; ++i)
-                {
-                    range_x = mpi_struct.start_end_x.first + mpi_struct.start_end_x.second;
-                    start_x = range_x / thread_count * i;
-                    end_x = range_x / thread_count * (i + 1);
-                    _thread_group.create_thread(
-                            [mpi_struct, start_x, end_x]
-                            {
-
-                            }
-                    );
-                }
-
-            });
-}
-
-void Fraclium::MPICalculator::threadFunction(int start_x, int end_x, int start_y, int end_y)
-{
-    for (int x = start_x; x < end_x; ++x)
-        for (int y = start_y; y < end_y; ++y)
+    for (uint16_t x = data.start_x; x < data.end_x; ++x)
+    {
+        for (uint16_t y = data.start_y; y < data.end_y; ++y)
         {
+            boost::this_thread::interruption_point();
             Fractalium::Complex point = Fractalium::Complex(
-                    Fractalium::Fractal::_offset.first + x * _mpi_struct.step_coord,
-                    Fractalium::Fractal::_offset.second + y * _mpi_struct.step_coord
+                    mpi_struct.offset_x + x * mpi_struct.step_coord,
+                    mpi_struct.offset_y + y * mpi_struct.step_coord
             );
-            int q = _mpi_struct.fractal.pointCheck(point, _mpi_struct.iterations);
+            int q = mpi_struct.fractal.pointCheck(point, mpi_struct.iterations);
+            image.setPixel(x, y, q);
         }
+    }
 }
 
 
-void Fraclium::MPICalculator::receive()
+void Fractalium::MPICalculator::receive(Image &image)
 {
+    mpi::communicator world;
 
+
+    if (rank == 0)
+    {
+
+        auto counter = new std::atomic<uint16_t>(0);
+        for (int proc = 1; proc < world.size(); ++proc)
+        {
+
+            auto image_tmp = Image();
+            auto request = world.irecv(proc, 1, image_tmp);
+            request.wait();
+            image.merge(image_tmp);
+            (*counter)++;
+            if (*counter == world.size() - 1)
+            {
+                signal();
+                counter->store(0);
+            }
+        }
+    }
+}
+
+void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
+{
+    mpi::communicator world;
+
+    if (rank == 0)
+    {
+        MPIStruct mpi_tmp = data;
+
+        auto x_delta = mpi_tmp.end_x - mpi_tmp.start_x;
+
+        for (int proc = 0; proc < world.size() - 1; ++proc)
+        {
+            mpi_tmp.start_x = x_delta / (world.size() - 1) * proc;
+            mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
+            world.isend(proc + 1, 0, mpi_tmp);
+        }
+        receive(image);
+    }
 }

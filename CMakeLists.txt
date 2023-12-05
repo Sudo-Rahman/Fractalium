@@ -6,6 +6,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -funroll-loops")
+set(CMAKE_BUILD_TYPE Release)
 
 find_package(Qt6 COMPONENTS
         Core
@@ -25,11 +27,19 @@ include_directories(src)
 
 add_executable(Fractalium ${SRC} main.cpp)
 
-target_compile_options(Fractalium PRIVATE -O3)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+
+include(ProcessorCount)
+ProcessorCount(N)
+if (NOT N EQUAL 0)
+    set(CMAKE_BUILD_PARALLEL_LEVEL ${N})
+endif ()
+
 target_link_libraries(Fractalium
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Boost::thread
         Boost::mpi
         Boost::thread
 )

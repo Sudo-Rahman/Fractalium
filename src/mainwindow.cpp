@@ -2,12 +2,14 @@
 #include "mainwindow.hpp"
 #include <iostream>
 #include <chrono>
+#include <QApplication>
+#include <MPI.hpp>
 
 using std::min;
 using std::max;
+using Fractalium::Double;
 
-struct color
-{
+struct color {
     int r, g, b;
 };
 
@@ -17,16 +19,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setCentralWidget(central);
 
 
-    label = new Fractalium::FractalWidget(central);
-    label->setAlignment(Qt::AlignCenter);
-    label->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
-    label->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    _label = new Fractalium::FractalWidget(central);
+    _label->setAlignment(Qt::AlignCenter);
+    _label->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    _label->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
     this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
     this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
-    _step_coord = 4.0 / label->width();
 
+    _step_coord = 4.0 / _label->width();
 
 
     auto get_color = [](const int &i) -> color
@@ -41,36 +43,51 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     _color_map = std::vector<QColor>(Fractalium::Fractal::ITERATIONS);
 
     color c{};
-    for (int i = 0;i < Fractalium::Fractal::ITERATIONS ; i++)
+    for (int i = 0; i < Fractalium::Fractal::ITERATIONS; i++)
     {
-        c = get_color((i*5)%255);
-        _color_map[i]=QColor::fromRgb(c.r, c.g, c.b).name();
+        c = get_color((i * 5) % 255);
+        _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
     }
     _color_map.emplace_back(QColor::fromRgb(0, 0, 0).name());
-    image = new QImage(label->width(), label->height(), QImage::Format_RGB32);
+
+
+    _image = new QImage(_label->width(), _label->height(), QImage::Format_RGB32);
+
+    _diergence_image = Fractalium::Image(_label->width(), _label->height());
 
     setupUi();
 
-    connect(label, &Fractalium::FractalWidget::newSelection, this, &MainWindow::newSelection);
+    _fractal = new Fractalium::Fractal();
+
+    connect(_label, &Fractalium::FractalWidget::newSelection, this, &MainWindow::newSelection);
+
+    Fractalium::MPICalculator::signal.connect([this]
+                                              {
+                                                  qApp->postEvent(this, new PaintFractalEvent);
+                                              });
 }
 
 
 void MainWindow::paintFractal()
 {
-    int q;
-    for (int i = 0; i < label->width(); ++i)
+    uint16_t start_x, end_x, end_y, start_y;
+    start_x = 0;
+    end_x = _diergence_image.width();
+    start_y = 0;
+    end_y = _diergence_image.height();
+
+    for (uint16_t x = start_x; x < end_x; ++x)
     {
-        for (int j = 0; j < label->height(); ++j)
+        for (uint16_t y = start_y; y < end_y; ++y)
         {
-            Fractalium::Complex point = Fractalium::Complex(
-                    Fractalium::Fractal::_offset.first + i * _step_coord,
-                    Fractalium::Fractal::_offset.second + j * _step_coord
-            );
-            q = fractal->pointCheck(point, Fractalium::Fractal::ITERATIONS);
-            image->setPixelColor(i, j, _color_map[q]);
+            if (_diergence_image.getPixel(x, y) == -1)
+                continue;
+            int q = _diergence_image.getPixel(x, y);
+            _image->setPixelColor(x, y, _color_map[q]);
         }
     }
-    label->setFractal(*image);
+    _back_history.emplace_back(history{*_image, _offset, _step_coord});
+    _label->setFractal(*_image);
 }
 
 /**
@@ -82,17 +99,30 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 {
 
     // on calcule le nouveau offset x
-    Fractalium::Fractal::_offset.first =
-            Fractalium::Fractal::_offset.first + start.x() * _step_coord;
+    _offset.first =
+            _offset.first + start.x() * _step_coord;
     // on calcule le nouveau offset y
-    Fractalium::Fractal::_offset.second =
-            Fractalium::Fractal::_offset.second + start.y() * _step_coord;
+    _offset.second =
+            _offset.second + start.y() * _step_coord;
 
     // on calcule le nouveau step_coord
-    int xDelta = end.x() - start.x(), yDelta = abs(end.y() - start.y());
-    _step_coord = min(xDelta, yDelta) * _step_coord;
+    int xDelta = abs(end.x() - start.x()), yDelta = abs(end.y() - start.y());
+    _step_coord = Double(max(xDelta, yDelta)) / Double(_label->height() + _label->width()) *
+                  _step_coord;
 
-    paintFractal();
+
+    Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+            0, _label->width(),
+            0, _label->height(),
+            _offset.first,
+            _offset.second,
+            _label->width(), _label->height(),
+            Fractalium::Fractal::ITERATIONS,
+            _step_coord,
+            *_fractal
+    );
+
+    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
 }
 
 void MainWindow::setupUi()
@@ -108,16 +138,41 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Mandelbrot;
-        paintFractal();
+        *_fractal = Fractalium::Fractal();
+        mpiCalculate();
     });
 
     action = new QAction("Julia", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Julia;
-        paintFractal();
+        *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Julia);
+        mpiCalculate();
+    });
+
+    action = new QAction("BurningShip", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
+    {
+        *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::BurningShip);
+        mpiCalculate();
+    });
+
+    action = new QAction("Newton", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
+    {
+        *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Newton);
+        mpiCalculate();
+    });
+
+
+    action = new QAction("Koch", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
+    {
+        *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Koch);
+        mpiCalculate();
     });
 
     auto *menu2 = new QMenu("History", _menu_bar);
@@ -125,8 +180,70 @@ void MainWindow::setupUi()
 
     action = new QAction("Back", menu2);
     menu2->addAction(action);
-    connect(action, &QAction::triggered, this, [this]()
+    connect(action, &QAction::triggered, this, &MainWindow::back);
+
+    action = new QAction("Front", menu2);
+    menu2->addAction(action);
+    connect(action, &QAction::triggered, this, &MainWindow::front);
+
+    action = new QAction("Save", menu2);
+    menu2->addAction(action);
+    connect(action, &QAction::triggered, this, &MainWindow::saveImage);
+
+}
+
+bool MainWindow::event(QEvent *event)
+{
+    if (event->type() == PaintFractalEvent::PaintFractalEventType)
     {
-        label->back();
-    });
+        paintFractal();
+        return true;
+    }
+    return QMainWindow::event(event);
+}
+
+void MainWindow::mpiCalculate()
+{
+    Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+            0, _label->width(),
+            0, _label->height(),
+            _offset.first,
+            _offset.second,
+            _label->width(), _label->height(),
+            Fractalium::Fractal::ITERATIONS,
+            _step_coord,
+            *_fractal
+    );
+    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
+}
+
+void MainWindow::back()
+{
+    if (_back_history.empty())
+        return;
+    auto h = _back_history.back();
+    _back_history.pop_back();
+    _front_history.emplace_back(history{*_image, _offset, _step_coord});
+    _offset = h.offset;
+    _step_coord = h.step_coord;
+    *_image = h.image;
+    _label->setFractal(*_image);
+}
+
+void MainWindow::front()
+{
+    if (_front_history.empty())
+        return;
+    auto h = _front_history.back();
+    _front_history.pop_back();
+    _back_history.emplace_back(history{*_image, _offset, _step_coord});
+    _offset = h.offset;
+    _step_coord = h.step_coord;
+    *_image = h.image;
+    _label->setFractal(*_image);
+}
+
+void MainWindow::saveImage()
+{
+    _image->save("fractal.png");
 }

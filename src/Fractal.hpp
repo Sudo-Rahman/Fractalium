@@ -6,44 +6,77 @@
 #define FRACTALIUM_FRACTAL_HPP
 
 #include <Complex.hpp>
+#include <iostream>
+#include <boost/serialization/serialization.hpp>
 
 
-namespace Fractalium
-{
+namespace Fractalium {
 
-    enum class FractalType {
-        Mandelbrot,
-        Julia
-    };
 
     class Fractal {
 
 
     public:
-        [[nodiscard]] virtual int pointCheck(const Complex &pointm, int iterations) const
-        { return 0; };
+        enum class FractalType {
+            Mandelbrot,
+            Julia,
+            BurningShip,
+            Newton,
+            Koch
+        };
+
+        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type) {}
+
+        [[nodiscard]] int pointCheck(const Complex &pointm, int iterations) const;
 
         static const int ITERATIONS;
 
-        static std::pair<Double, Double> _offset;
-    };
+        void setType(FractalType type) {
+            _type = type;
+        }
 
-    class Mandelbrot : public Fractal {
+        [[nodiscard]] FractalType getType() const {
+            return _type;
+        }
 
-    public:
-        [[nodiscard]] int pointCheck(const Complex &point, int iterations) const override;
-    };
+    private:
 
-    class Julia : public Fractal {
+        FractalType _type;
 
-        Complex juliaConstant{0.285, 0.01};
-    public:
-        explicit Julia(const Complex& constant) : juliaConstant(constant)
-        {}
 
-        explicit Julia() = default;
+        friend class boost::serialization::access;
 
-        [[nodiscard]] int pointCheck(const Complex &point, int iterations) const override;
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version) {
+            ar & _type;
+        }
+
+        class Mandelbrot {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class Julia {
+            static Complex juliaConstant;
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class BurningShip {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class Newton {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class Koch {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
     };
 }
 
