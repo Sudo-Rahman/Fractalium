@@ -31,8 +31,6 @@ namespace Fractalium {
 
         static const int ITERATIONS;
 
-        static std::pair<Double, Double> _offset;
-
         void setType(FractalType type) {
             _type = type;
         }

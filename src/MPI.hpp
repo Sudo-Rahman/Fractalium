@@ -27,43 +27,44 @@ namespace Fractalium
 
         MPIStruct(const MPIStruct &aStruct)
         {
-            start_end_x = aStruct.start_end_x;
-            start_end_y = aStruct.start_end_y;
+            start_x = aStruct.start_x;
+            end_x = aStruct.end_x;
+            start_y = aStruct.start_y;
+            end_y = aStruct.end_y;
+            offset_x = aStruct.offset_x;
+            offset_y = aStruct.offset_y;
+            width = aStruct.width;
+            height = aStruct.height;
             iterations = aStruct.iterations;
             step_coord = aStruct.step_coord;
-            offset = aStruct.offset;
             fractal = aStruct.fractal;
-            image = aStruct.image;
         }
 
-        std::pair<uint16_t, uint16_t> start_end_x;
-        std::pair<uint16_t, uint16_t> start_end_y;
+        uint16_t start_x;
+        uint16_t end_x;
+
+        uint16_t start_y;
+        uint16_t end_y;
+
+        Double offset_x;
+        Double offset_y;
+
+        uint16_t width;
+        uint16_t height;
 
         int iterations{};
 
         Double step_coord;
 
-        std::pair<Double, Double> offset;
-
         Fractal fractal;
 
-        Image image;
-
-        MPIStruct(const std::pair<uint16_t, uint16_t> &start_end_x,
-                  const std::pair<uint16_t, uint16_t> &start_end_y,
-                  uint32_t iterations,
-                  Double step_coord,
-                  std::pair<Double, Double> offset,
-                  const Fractalium::Fractal &fractal) :
-                start_end_x(start_end_x),
-                start_end_y(start_end_y),
-                iterations(iterations),
-                step_coord(step_coord),
-                offset(offset),
+        MPIStruct(uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y, Double offset_x, Double offset_y,
+                  uint16_t width, uint16_t height, int iterations, Double step_coord, Fractal fractal) :
+                start_x(start_x), end_x(end_x), start_y(start_y), end_y(end_y), offset_x(offset_x),
+                offset_y(offset_y), width(width), height(height), iterations(iterations), step_coord(step_coord),
                 fractal(fractal)
-        {
-            image = Image(start_end_x.second - start_end_x.first, start_end_y.second - start_end_y.first);
-        }
+        {}
+
 
         MPIStruct() = default;
 
@@ -74,13 +75,17 @@ namespace Fractalium
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version)
         {
-            ar & start_end_x;
-            ar & start_end_y;
+            ar & start_x;
+            ar & end_x;
+            ar & start_y;
+            ar & end_y;
+            ar & offset_x;
+            ar & offset_y;
+            ar & width;
+            ar & height;
             ar & iterations;
             ar & step_coord;
-            ar & offset;
             ar & fractal;
-            ar & image;
         }
 
     };
@@ -94,27 +99,15 @@ namespace Fractalium
 
         static uint16_t rank;
 
-        static std::atomic<uint16_t> thread_finished;
-
-        static boost::thread_group thread_group_task;
-
-        static boost::thread_group thread_group_io;
-
-        static std::vector<std::future<void>> futures;
-
-        static boost::asio::io_context io_context;
-        static boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 
         explicit MPICalculator(uint16_t rank);
 
-        static void calculate(const MPIStruct &mpi_struct);
+        static void calculate(const MPIStruct &mpi_struct, Image &image);
 
 
-        static void threadFunction(uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y);
+        static void send(const MPIStruct &mpi_struct, Image &image);
 
-        static void send(const MPIStruct &mpi_struct);
-
-        static void receive();
+        static void receive(Image &image);
 
     public:
 

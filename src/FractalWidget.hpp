@@ -21,8 +21,6 @@ namespace Fractalium
 
         QPoint _start_point, _release_point;
 
-        std::vector<QImage> _history;
-
 
         void setPixmap(const QPixmap &pixmap);
 
@@ -32,9 +30,6 @@ namespace Fractalium
 
         ~FractalWidget() override
         = default;
-
-        void back();
-
 
         void setFractal(const QImage &image);
 

@@ -50,15 +50,6 @@ void FractalWidget::mouseMoveEvent(QMouseEvent *event)
     _rubber_band->show();
 }
 
-void FractalWidget::back()
-{
-    if (!_history.empty())
-    {
-        _history.pop_back();
-        setPixmap(QPixmap::fromImage(_history.back()));
-    }
-}
-
 void FractalWidget::setPixmap(const QPixmap &pixmap)
 {
     QLabel::setPixmap(pixmap);
@@ -66,7 +57,6 @@ void FractalWidget::setPixmap(const QPixmap &pixmap)
 
 void FractalWidget::setFractal(const QImage &image)
 {
-    _history.push_back(image);
     setPixmap(QPixmap::fromImage(image));
 }
 

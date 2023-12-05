@@ -9,9 +9,9 @@ Fractalium::Image::Image(uint32_t size_x, uint32_t size_y)
 {
     _width = size_x;
     _height = size_y;
-    _image.resize(size_x);
+    _image.resize(size_y);
     for (auto &i: _image)
-        i.resize(size_y);
+        i.resize(size_x);
 
 //    init all pixels to -1
     for (auto &i: _image)
@@ -25,7 +25,6 @@ void Fractalium::Image::setPixel(uint16_t x, uint16_t y, int value)
         std::cout << "x: " << x << " y: " << y << std::endl;
         throw std::out_of_range("Pixel out of range");
     }
-    std::lock_guard<std::mutex> lock(mutex);
     _image[x][y] = value;
 }
 
@@ -51,12 +50,15 @@ Fractalium::Image::Image(Fractalium::Image &&other) noexcept
 
 }
 
+#include <boost/mpi.hpp>
 void Fractalium::Image::merge(Fractalium::Image &image)
 {
     if (width() != image.width() || height() != image.height())
+    {
+        std::cout << boost::mpi::communicator().rank() << std::endl;
         throw std::invalid_argument("Images must have the same size");
+    }
 
-    std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < width(); ++i)
     {
         for (int j = 0; j < height(); ++j)

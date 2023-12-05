@@ -9,8 +9,6 @@ using namespace Fractalium;
 
 const int Fractal::ITERATIONS = 1000;
 
-std::pair<Double, Double> Fractal::_offset = {-2.1, -2};
-
 Complex Fractal::Julia::juliaConstant = {0.285, 0.01};
 
 /**
