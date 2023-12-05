@@ -13,8 +13,7 @@ struct color {
     int r, g, b;
 };
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     auto *central = new QWidget(this);
     this->setCentralWidget(central);
 
@@ -30,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     _step_coord = 4.0 / label->width();
 
 
-    auto get_color = [](const int &i) -> color
-    {
+    auto get_color = [](const int &i) -> color {
         color c{};
         c.r = i;
         c.g = 200;
@@ -88,10 +86,10 @@ void MainWindow::paintFractal()
     start_y = 0;
     end_y = Fractalium::MPICalculator::mpi_struct.image.height();
 
-    for (uint16_t x = start_x; x < end_x; ++x)
-    {
-        for (uint16_t y = start_y; y < end_y; ++y)
-        {
+    for (uint16_t x = start_x; x < end_x; ++x) {
+        for (uint16_t y = start_y; y < end_y; ++y) {
+            if (Fractalium::MPICalculator::mpi_struct.image.getPixel(x, y) == -1)
+                continue;
             int q = Fractalium::MPICalculator::mpi_struct.image.getPixel(x, y);
             image->setPixelColor(x, y, _color_map[q]);
         }
@@ -104,8 +102,7 @@ void MainWindow::paintFractal()
  * @param start
  * @param end
  */
-void MainWindow::newSelection(const QPoint &start, const QPoint &end)
-{
+void MainWindow::newSelection(const QPoint &start, const QPoint &end) {
 
     // on calcule le nouveau offset x
     Fractalium::Fractal::_offset.first =
@@ -175,7 +172,52 @@ void MainWindow::setupUi()
                 Fractalium::Fractal::_offset,
                 *fractal
         );
+        Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct);
+    });
 
+    action = new QAction("BurningShip", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]() {
+        fractal = new Fractalium::Fractal(Fractalium::Fractal::FractalType::BurningShip);
+        Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+                std::pair<uint16_t, uint16_t>(0, label->width()),
+                std::pair<uint16_t, uint16_t>(0, label->height()),
+                Fractalium::Fractal::ITERATIONS,
+                _step_coord,
+                Fractalium::Fractal::_offset,
+                *fractal
+        );
+        Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct);
+    });
+
+    action = new QAction("Newton", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]() {
+        fractal = new Fractalium::Fractal(Fractalium::Fractal::FractalType::Newton);
+        Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+                std::pair<uint16_t, uint16_t>(0, label->width()),
+                std::pair<uint16_t, uint16_t>(0, label->height()),
+                Fractalium::Fractal::ITERATIONS,
+                _step_coord,
+                Fractalium::Fractal::_offset,
+                *fractal
+        );
+        Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct);
+    });
+
+
+    action = new QAction("Koch", menu);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, [this]() {
+        fractal = new Fractalium::Fractal(Fractalium::Fractal::FractalType::Koch);
+        Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+                std::pair<uint16_t, uint16_t>(0, label->width()),
+                std::pair<uint16_t, uint16_t>(0, label->height()),
+                Fractalium::Fractal::ITERATIONS,
+                _step_coord,
+                Fractalium::Fractal::_offset,
+                *fractal
+        );
         Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct);
     });
 

@@ -30,7 +30,7 @@ namespace Fractalium
 
         void setPixel(uint16_t x, uint16_t y, int value);
 
-        [[nodiscard]] void merge(Image &image);
+        void merge(Image &image);
 
         int getPixel(int x, int y)
         {

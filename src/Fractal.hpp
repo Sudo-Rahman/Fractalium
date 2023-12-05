@@ -10,8 +10,7 @@
 #include <boost/serialization/serialization.hpp>
 
 
-namespace Fractalium
-{
+namespace Fractalium {
 
 
     class Fractal {
@@ -20,11 +19,13 @@ namespace Fractalium
     public:
         enum class FractalType {
             Mandelbrot,
-            Julia
+            Julia,
+            BurningShip,
+            Newton,
+            Koch
         };
 
-        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type)
-        {}
+        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type) {}
 
         [[nodiscard]] int pointCheck(const Complex &pointm, int iterations) const;
 
@@ -32,13 +33,11 @@ namespace Fractalium
 
         static std::pair<Double, Double> _offset;
 
-        void setType(FractalType type)
-        {
+        void setType(FractalType type) {
             _type = type;
         }
 
-        [[nodiscard]] FractalType getType() const
-        {
+        [[nodiscard]] FractalType getType() const {
             return _type;
         }
 
@@ -50,8 +49,7 @@ namespace Fractalium
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive &ar, const unsigned int version)
-        {
+        void serialize(Archive &ar, const unsigned int version) {
             ar & _type;
         }
 
@@ -62,6 +60,21 @@ namespace Fractalium
 
         class Julia {
             static Complex juliaConstant;
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class BurningShip {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class Newton {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
+
+        class Koch {
         public:
             [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
         };
