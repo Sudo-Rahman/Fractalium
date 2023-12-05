@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
                 auto request = world.irecv(0, 0, mpiStruct);
                 request.wait();
             }
-            std::cout << "received: " << world.rank() << std::endl;
             std::cout << mpiStruct.width << " " << mpiStruct.height << std::endl;
             Fractalium::MPICalculator::mpi_struct = mpiStruct;
             auto image = Fractalium::Image(mpiStruct.width, mpiStruct.height);
