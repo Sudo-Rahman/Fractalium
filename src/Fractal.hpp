@@ -6,55 +6,66 @@
 #define FRACTALIUM_FRACTAL_HPP
 
 #include <Complex.hpp>
+#include <iostream>
 #include <boost/serialization/serialization.hpp>
 
 
 namespace Fractalium
 {
 
-    enum class FractalType {
-        Mandelbrot,
-        Julia
-    };
 
     class Fractal {
 
 
     public:
-        [[nodiscard]] virtual int pointCheck(const Complex &pointm, int iterations) const
-        { return 0; };
+        enum class FractalType {
+            Mandelbrot,
+            Julia
+        };
+
+        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type)
+        {}
+
+        [[nodiscard]] int pointCheck(const Complex &pointm, int iterations) const;
 
         static const int ITERATIONS;
 
         static std::pair<Double, Double> _offset;
 
+        void setType(FractalType type)
+        {
+            _type = type;
+        }
+
+        [[nodiscard]] FractalType getType() const
+        {
+            return _type;
+        }
+
     private:
+
+        FractalType _type;
+
+
         friend class boost::serialization::access;
 
         template<class Archive>
         void serialize(Archive &ar, const unsigned int version)
         {
-            ar & _offset;
+            ar & _type;
         }
 
-    };
+        class Mandelbrot {
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
 
-    class Mandelbrot : public Fractal {
+        class Julia {
+            static Complex juliaConstant;
+        public:
+            [[nodiscard]] static int pointCheck(const Complex &point, int iterations);
+        };
 
-    public:
-        [[nodiscard]] int pointCheck(const Complex &point, int iterations) const override;
-    };
-
-    class Julia : public Fractal {
-
-        Complex juliaConstant{0.285, 0.01};
-    public:
-        explicit Julia(const Complex& constant) : juliaConstant(constant)
-        {}
-
-        explicit Julia() = default;
-
-        [[nodiscard]] int pointCheck(const Complex &point, int iterations) const override;
     };
 }
 

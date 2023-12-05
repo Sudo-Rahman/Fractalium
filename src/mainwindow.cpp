@@ -48,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
     }
     _color_map.emplace_back(QColor::fromRgb(0, 0, 0).name());
+
+
     image = new QImage(label->width(), label->height(), QImage::Format_RGB32);
 
     setupUi();
@@ -85,6 +87,7 @@ void MainWindow::paintFractal()
     end_x = Fractalium::MPICalculator::mpi_struct.image.width();
     start_y = 0;
     end_y = Fractalium::MPICalculator::mpi_struct.image.height();
+
     for (uint16_t x = start_x; x < end_x; ++x)
     {
         for (uint16_t y = start_y; y < end_y; ++y)
@@ -116,7 +119,7 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
               << std::endl;
 
     // on calcule le nouveau step_coord
-    int xDelta = end.x() - start.x(), yDelta = abs(end.y() - start.y());
+    int xDelta = abs(end.x()-start.x()), yDelta = abs(end.y() - start.y());
     _step_coord = Fractalium::Double(max(xDelta, yDelta)) / Fractalium::Double(label->height() + label->width()) *
                   _step_coord;
 
@@ -146,7 +149,7 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Mandelbrot;
+        fractal = new Fractalium::Fractal;
         Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
                 std::pair<uint16_t, uint16_t>(0, label->width()),
                 std::pair<uint16_t, uint16_t>(0, label->height()),
@@ -163,8 +166,17 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        fractal = new Fractalium::Julia;
-        paintFractal();
+        fractal = new Fractalium::Fractal(Fractalium::Fractal::FractalType::Julia);
+        Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
+                std::pair<uint16_t, uint16_t>(0, label->width()),
+                std::pair<uint16_t, uint16_t>(0, label->height()),
+                Fractalium::Fractal::ITERATIONS,
+                _step_coord,
+                Fractalium::Fractal::_offset,
+                *fractal
+        );
+
+        Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct);
     });
 
     auto *menu2 = new QMenu("History", _menu_bar);
