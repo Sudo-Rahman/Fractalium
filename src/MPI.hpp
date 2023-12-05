@@ -25,6 +25,17 @@ namespace Fractalium
 
     public:
 
+        MPIStruct(const MPIStruct &aStruct)
+        {
+            start_end_x = aStruct.start_end_x;
+            start_end_y = aStruct.start_end_y;
+            iterations = aStruct.iterations;
+            step_coord = aStruct.step_coord;
+            offset = aStruct.offset;
+            fractal = aStruct.fractal;
+            image = aStruct.image;
+        }
+
         std::pair<uint16_t, uint16_t> start_end_x;
         std::pair<uint16_t, uint16_t> start_end_y;
 
@@ -85,15 +96,16 @@ namespace Fractalium
 
         static std::atomic<uint16_t> thread_finished;
 
-        static boost::thread_group thread_group;
+        static boost::thread_group thread_group_task;
 
-        static boost::thread thread_io;
+        static boost::thread_group thread_group_io;
+
         static boost::asio::io_context io_context;
         static boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 
         explicit MPICalculator(uint16_t rank);
 
-        static void calculate();
+        static void calculate(const MPIStruct &mpi_struct);
 
 
         static void threadFunction(uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y);

@@ -9,9 +9,13 @@ namespace mpi = boost::mpi;
 
 namespace fr = Fractalium;
 
+using std::cout;
+using std::endl;
+
 
 boost::asio::io_context Fractalium::MPICalculator::io_context;
-boost::thread_group Fractalium::MPICalculator::thread_group;
+boost::thread_group Fractalium::MPICalculator::thread_group_io;
+boost::thread_group Fractalium::MPICalculator::thread_group_task;
 Fractalium::MPIStruct Fractalium::MPICalculator::mpi_struct;
 std::atomic<uint16_t> Fractalium::MPICalculator::thread_finished = 0;
 uint16_t Fractalium::MPICalculator::rank = 0;
@@ -21,51 +25,64 @@ boost::asio::executor_work_guard<boost::asio::io_context::executor_type>  Fracta
 
 boost::signals2::signal<void()> Fractalium::MPICalculator::signal;
 
-boost::thread Fractalium::MPICalculator::thread_io;
-
 
 Fractalium::MPICalculator::MPICalculator(uint16_t rank)
 {
-    rank = rank;
+    MPICalculator::rank = rank;
 }
 
 void Fractalium::MPICalculator::run()
 {
-    thread_io = boost::thread([]
-                              { return io_context.run(); });
 
-    boost::asio::post(io_context,
-                      []
-                      { receive(); });
+    thread_group_io.create_thread([]
+                                  { io_context.run(); });
+
+    boost::asio::post(io_context, []
+    { receive(); });
 }
 
 
-void Fractalium::MPICalculator::calculate()
+void Fractalium::MPICalculator::calculate(const MPIStruct &data)
 {
 
     boost::asio::post(io_context,
-                      []
+                      [data]
                       {
+                          thread_finished = 0;
+
                           uint16_t thread_count = boost::thread::hardware_concurrency();
 
                           int start_x, end_x, range_x;
                           for (int i = 0; i < thread_count; ++i)
                           {
-                              range_x = mpi_struct.start_end_x.first + mpi_struct.start_end_x.second;
-                              start_x = range_x / thread_count * i;
-                              end_x = range_x / thread_count * (i + 1);
-                              thread_group.create_thread(
-                                      [start_x, end_x, thread_count]
+                              range_x = data.start_end_x.second - data.start_end_x.first;
+                              start_x = range_x / thread_count * i + data.start_end_x.first;
+                              end_x = range_x / thread_count * (i + 1) + data.start_end_x.first;
+
+                              thread_group_task.create_thread(
+                                      [start_x, end_x, thread_count, data]
                                       {
-                                          threadFunction(start_x, end_x, mpi_struct.start_end_y.first,
-                                                         mpi_struct.start_end_y.second);
+                                          threadFunction(start_x, end_x, data.start_end_y.first,
+                                                         data.start_end_y.second);
 
                                           thread_finished++;
 
-                                          if (thread_finished == thread_count)
+                                          if(mpi::communicator().size() == 1)
                                           {
-//                                              send(mpi_struct);
-                                              signal();
+                                              if (thread_finished == thread_count)
+                                              {
+                                                  signal();
+                                              }
+                                          }
+                                          else
+                                          {
+                                              if (thread_finished == thread_count)
+                                              {
+                                                  if (rank not_eq 0)
+                                                  {
+                                                      send(mpi_struct);
+                                                  }
+                                              }
                                           }
                                       }
                               );
@@ -95,9 +112,10 @@ void Fractalium::MPICalculator::receive()
 {
     mpi::communicator world;
 
+
     if (rank == 0)
     {
-        thread_group.create_thread(
+        thread_group_io.create_thread(
                 [world]
                 {
                     while (true)
@@ -105,24 +123,22 @@ void Fractalium::MPICalculator::receive()
                         for (int proc = 1; proc < world.size(); ++proc)
                         {
                             auto mpi_tmp = MPIStruct();
-                            world.recv(proc, 0, mpi_tmp);
+                            world.recv(proc, 1, mpi_tmp);
                             mpi_struct.image.merge(mpi_tmp.image);
                         }
-//                        signal();
                     }
                 });
 
     } else
     {
-        thread_group.create_thread(
+        thread_group_io.create_thread(
                 [world]
                 {
                     while (true)
                     {
-                        thread_finished = 0;
-                        thread_group.interrupt_all();
                         world.recv(0, 0, mpi_struct);
-                        calculate();
+//                        thread_group_task.interrupt_all();
+                        calculate(mpi_struct);
                     }
                 });
     }
@@ -132,19 +148,24 @@ void Fractalium::MPICalculator::send(const MPIStruct &data)
 {
     mpi::communicator world;
 
-    mpi_struct = data;
-
-    thread_finished = 0;
-
     if (rank == 0)
     {
+        MPIStruct mpi_tmp = data;
+
+        auto x_delta = mpi_tmp.start_end_x.second - mpi_tmp.start_end_x.first;
+
         for (int proc = 1; proc < world.size(); ++proc)
         {
-            world.send(proc, 0, data);
+            mpi_tmp.start_end_x.first = x_delta / world.size() * proc;
+            mpi_tmp.start_end_x.second = x_delta / world.size() * (proc + 1);
+            world.send(proc, 1, mpi_tmp);
         }
-        calculate();
+        mpi_tmp.start_end_x.first = 0;
+        mpi_tmp.start_end_x.second = x_delta / world.size();
+        thread_group_task.interrupt_all();
+        calculate(mpi_tmp);
     } else
     {
-        world.send(0, 0, data);
+        world.send(0, 1, data);
     }
 }
