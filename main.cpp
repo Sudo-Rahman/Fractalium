@@ -10,7 +10,7 @@ namespace frac = Fractalium;
 int main(int argc, char *argv[])
 {
 
-    mpi::environment env;
+    mpi::environment env(argc, argv);
     mpi::communicator world;
 
     frac::MPICalculator mpiCalculator(world.rank());
