@@ -199,6 +199,10 @@ bool MainWindow::event(QEvent *event)
         paintFractal();
         return true;
     }
+    if(event->type() == QEvent::Close)
+    {
+        Fractalium::MPICalculator::stop();
+    }
     return QMainWindow::event(event);
 }
 

@@ -104,14 +104,14 @@ namespace Fractalium
 
         static void calculate(const MPIStruct &mpi_struct, Image &image);
 
-
         static void send(const MPIStruct &mpi_struct, Image &image);
 
         static void receive(Image &image);
 
+
     public:
 
-        static void run();
+        static void stop();
     };
 
 }

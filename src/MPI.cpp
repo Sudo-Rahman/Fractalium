@@ -24,11 +24,6 @@ Fractalium::MPICalculator::MPICalculator(uint16_t rank)
     MPICalculator::rank = rank;
 }
 
-void Fractalium::MPICalculator::run()
-{
-
-}
-
 
 void Fractalium::MPICalculator::calculate(const MPIStruct &data, Image &image)
 {
@@ -93,4 +88,9 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         }
         receive(image);
     }
+}
+
+void Fractalium::MPICalculator::stop()
+{
+    exit(0);
 }
