@@ -7,7 +7,7 @@
 
 using namespace Fractalium;
 
-const int Fractal::ITERATIONS = 100;
+const int Fractal::ITERATIONS = 1000;
 
 std::pair<Double, Double> Fractal::_offset = {-2.1, -2};
 

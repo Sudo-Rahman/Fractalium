@@ -56,7 +56,7 @@ void Fractalium::Image::merge(Fractalium::Image &image)
     if (width() != image.width() || height() != image.height())
         throw std::invalid_argument("Images must have the same size");
 
-
+    std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < width(); ++i)
     {
         for (int j = 0; j < height(); ++j)

@@ -18,6 +18,7 @@ boost::thread_group Fractalium::MPICalculator::thread_group_io;
 boost::thread_group Fractalium::MPICalculator::thread_group_task;
 Fractalium::MPIStruct Fractalium::MPICalculator::mpi_struct;
 std::atomic<uint16_t> Fractalium::MPICalculator::thread_finished = 0;
+std::vector<std::future<void>>Fractalium::MPICalculator::futures;
 uint16_t Fractalium::MPICalculator::rank = 0;
 
 boost::asio::executor_work_guard<boost::asio::io_context::executor_type>  Fractalium::MPICalculator::work_guard(
@@ -67,17 +68,18 @@ void Fractalium::MPICalculator::calculate(const MPIStruct &data)
 
                                           thread_finished++;
 
-                                          if(mpi::communicator().size() == 1)
+                                          if (mpi::communicator().size() == 1)
                                           {
                                               if (thread_finished == thread_count)
                                               {
                                                   signal();
                                               }
-                                          }
-                                          else
+                                          } else
                                           {
                                               if (thread_finished == thread_count)
                                               {
+                                                  cout << "rank: " << rank << " start_x: " << data.start_end_x.first
+                                                       << " end_x: " << data.start_end_x.second << endl;
                                                   if (rank not_eq 0)
                                                   {
                                                       send(mpi_struct);
@@ -115,18 +117,28 @@ void Fractalium::MPICalculator::receive()
 
     if (rank == 0)
     {
-        thread_group_io.create_thread(
+        boost::asio::post(io_context,
                 [world]
                 {
-                    while (true)
-                    {
+                        auto counter = new std::atomic<uint16_t>(0);
                         for (int proc = 1; proc < world.size(); ++proc)
                         {
-                            auto mpi_tmp = MPIStruct();
-                            world.recv(proc, 1, mpi_tmp);
-                            mpi_struct.image.merge(mpi_tmp.image);
+                            futures.emplace_back(std::async(std::launch::any, [world, proc, counter]
+                            {
+                                while (true)
+                                {
+                                    auto mpi_tmp = MPIStruct();
+                                    world.recv(proc, 1, mpi_tmp);
+                                    mpi_struct.image.merge(mpi_tmp.image);
+                                    (*counter)++;
+                                    if (*counter == world.size() - 1)
+                                    {
+                                        signal();
+                                        counter->store(0);
+                                    }
+                                }
+                            }));
                         }
-                    }
                 });
 
     } else
@@ -137,7 +149,7 @@ void Fractalium::MPICalculator::receive()
                     while (true)
                     {
                         world.recv(0, 0, mpi_struct);
-//                        thread_group_task.interrupt_all();
+                        thread_group_task.interrupt_all();
                         calculate(mpi_struct);
                     }
                 });
@@ -158,7 +170,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data)
         {
             mpi_tmp.start_end_x.first = x_delta / world.size() * proc;
             mpi_tmp.start_end_x.second = x_delta / world.size() * (proc + 1);
-            world.send(proc, 1, mpi_tmp);
+            world.isend(proc, 0, mpi_tmp);
         }
         mpi_tmp.start_end_x.first = 0;
         mpi_tmp.start_end_x.second = x_delta / world.size();
@@ -166,6 +178,6 @@ void Fractalium::MPICalculator::send(const MPIStruct &data)
         calculate(mpi_tmp);
     } else
     {
-        world.send(0, 1, data);
+        world.isend(0, 1, data);
     }
 }

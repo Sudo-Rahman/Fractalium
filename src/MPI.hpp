@@ -100,6 +100,8 @@ namespace Fractalium
 
         static boost::thread_group thread_group_io;
 
+        static std::vector<std::future<void>> futures;
+
         static boost::asio::io_context io_context;
         static boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 
