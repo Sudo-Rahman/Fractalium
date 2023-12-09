@@ -7,7 +7,7 @@
 
 using namespace Fractalium;
 
-const int Fractal::ITERATIONS = 1000;
+const int Fractal::ITERATIONS = 200;
 
 Complex Fractal::Julia::juliaConstant = {0.285, 0.01};
 
