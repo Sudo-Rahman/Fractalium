@@ -28,16 +28,14 @@ int main(int argc, char *argv[])
         {
             frac::MPIStruct mpiStruct;
             {
-                auto request = world.irecv(0, 0, mpiStruct);
-                request.wait();
+                world.recv(0, 0, mpiStruct);
                 std::cout << "received: " << world.rank() << std::endl;
             }
             Fractalium::MPICalculator::mpi_struct = mpiStruct;
             auto image = Fractalium::Image(mpiStruct.width, mpiStruct.height);
             frac::MPICalculator::calculate(mpiStruct, image);
             {
-                auto request = world.isend(0, 1, image);
-                request.wait();
+                world.send(0, 1, image);
             }
         }
     }

@@ -57,8 +57,7 @@ void Fractalium::MPICalculator::receive(Image &image)
         {
 
             auto image_tmp = Image();
-            auto request = world.irecv(proc, 1, image_tmp);
-            request.wait();
+            world.recv(proc, 1, image_tmp);
             image.merge(image_tmp);
             (*counter)++;
             if (*counter == world.size() - 1)
