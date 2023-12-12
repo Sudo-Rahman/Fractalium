@@ -41,5 +41,4 @@ target_link_libraries(Fractalium
         Qt::Widgets
         Boost::thread
         Boost::mpi
-        Boost::thread
 )

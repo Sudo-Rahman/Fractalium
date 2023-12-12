@@ -95,7 +95,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
     this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
-    _step_coord = 4.0 / _label->width();
     _color_map = std::vector<QColor>(MainWindow::TOTAL_COLORS);
 
     for (int i = 0; i < MainWindow::TOTAL_COLORS; i++) {
@@ -334,11 +333,11 @@ void MainWindow::mpiCalculate() {
 }
 
 void MainWindow::back() {
-    if (_back_history.empty())
+    if (_back_history.size() <= 1)
         return;
+    _front_history.emplace_back(history{*_image, _offset, _step_coord});
     _back_history.pop_back();
     auto h = _back_history.back();
-    _front_history.emplace_back(history{*_image, _offset, _step_coord});
     _offset = h.offset;
     _step_coord = h.step_coord;
     *_image = h.image;
@@ -351,12 +350,12 @@ void MainWindow::back() {
 void MainWindow::front() {
     if (_front_history.empty())
         return;
-    _front_history.pop_back();
     auto h = _front_history.back();
-    _back_history.emplace_back(history{*_image, _offset, _step_coord});
+    _front_history.pop_back();
     _offset = h.offset;
     _step_coord = h.step_coord;
     *_image = h.image;
+    _back_history.emplace_back(history{*_image, _offset, _step_coord});
     _label->setFractal(*_image);
 }
 
