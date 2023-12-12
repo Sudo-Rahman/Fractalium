@@ -15,6 +15,71 @@ struct color {
     int r, g, b;
 };
 
+auto get_color = [](const int &i) -> color {
+    color c{};
+
+    const double iteration = static_cast<double>(i) / Fractalium::Fractal::ITERATIONS;
+    const double hue = 45.0 + 315.0 * iteration;
+    const double C = 1.0 - std::abs(2.0 * iteration - 1.0);
+    const double X = C * (1.0 - std::abs(std::fmod(hue / 60.0, 2.0) - 1.0));
+    const double m = 0.0;
+
+    switch (color_mode) {
+
+        case 0:
+            c.r = static_cast<int>((C + m) * 255);
+            c.g = static_cast<int>((X + m) * 255);
+            c.b = static_cast<int>(m * 255);
+            break;
+
+        case 1:
+            c.r = static_cast<int>((X + m) * 255);
+            c.g = static_cast<int>((C + m) * 255);
+            c.b = static_cast<int>(m * 255);
+            break;
+
+        case 2:
+            c.r = static_cast<int>(m * 255);
+            c.g = static_cast<int>((C + m) * 255);
+            c.b = static_cast<int>((X + m) * 255);
+            break;
+
+        case 3:
+            c.r = static_cast<int>(m * 255);
+            c.g = static_cast<int>((X + m) * 255);
+            c.b = static_cast<int>((C + m) * 255);
+            break;
+
+        case 4:
+            c.r = static_cast<int>((X + m) * 255);
+            c.g = static_cast<int>(m * 255);
+            c.b = static_cast<int>((C + m) * 255);
+            break;
+
+        case 5:
+            c.r = static_cast<int>((C + m) * 255);
+            c.g = static_cast<int>(m * 255);
+            c.b = static_cast<int>((X + m) * 255);
+            break;
+
+        case 6:
+            c.r = static_cast<int>((C + m) * 255);
+            c.g = static_cast<int>((C + m) * 255);
+            c.b = static_cast<int>(m * 255);
+            break;
+
+        default:
+            c.r = static_cast<int>((C + m) * 255);
+            c.g = static_cast<int>((X + m) * 255);
+            c.b = static_cast<int>(m * 255);
+            break;
+    }
+
+    return c;
+};
+
+color c{};
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     auto *central = new QWidget(this);
     this->setCentralWidget(central);
@@ -28,76 +93,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
     this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
-
     _step_coord = 4.0 / _label->width();
-
-
-    auto get_color = [](const int &i) -> color {
-        color c{};
-
-        const double iteration = static_cast<double>(i) / Fractalium::Fractal::ITERATIONS;
-        const double hue = 45.0 + 315.0 * iteration;
-        const double C = 1.0 - std::abs(2.0 * iteration - 1.0);
-        const double X = C * (1.0 - std::abs(std::fmod(hue / 60.0, 2.0) - 1.0));
-        const double m = 0.0;
-
-        switch (color_mode) {
-
-            case 0:
-                c.r = static_cast<int>((C + m) * 255);
-                c.g = static_cast<int>((X + m) * 255);
-                c.b = static_cast<int>(m * 255);
-                break;
-
-            case 1:
-                c.r = static_cast<int>((X + m) * 255);
-                c.g = static_cast<int>((C + m) * 255);
-                c.b = static_cast<int>(m * 255);
-                break;
-
-            case 2:
-                c.r = static_cast<int>(m * 255);
-                c.g = static_cast<int>((C + m) * 255);
-                c.b = static_cast<int>((X + m) * 255);
-                break;
-
-            case 3:
-                c.r = static_cast<int>(m * 255);
-                c.g = static_cast<int>((X + m) * 255);
-                c.b = static_cast<int>((C + m) * 255);
-                break;
-
-            case 4:
-                c.r = static_cast<int>((X + m) * 255);
-                c.g = static_cast<int>(m * 255);
-                c.b = static_cast<int>((C + m) * 255);
-                break;
-
-            case 5:
-                c.r = static_cast<int>((C + m) * 255);
-                c.g = static_cast<int>(m * 255);
-                c.b = static_cast<int>((X + m) * 255);
-                break;
-
-            case 6:
-                c.r = static_cast<int>((C + m) * 255);
-                c.g = static_cast<int>((C + m) * 255);
-                c.b = static_cast<int>(m * 255);
-                break;
-
-            default:
-                c.r = static_cast<int>((C + m) * 255);
-                c.g = static_cast<int>((X + m) * 255);
-                c.b = static_cast<int>(m * 255);
-                break;
-        }
-
-        return c;
-    };
 
     _color_map = std::vector<QColor>(200);
 
-    color c{};
     for (int i = 0; i < 200; i++) {
         c = get_color(i);
         _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
@@ -122,6 +121,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 
+/**
+ * @brief Met à jour la couleur du fractal quand l'utilisateur change de couleur
+ */
+void MainWindow::updateColor() {
+    for (int i = 0; i < 200; i++) {
+        c = get_color(i);
+        _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
+    }
+}
+
+/**
+ * @brief Peint le fractal dans l'image
+ */
 void MainWindow::paintFractal() {
     uint16_t start_x, end_x, end_y, start_y;
     start_x = 0;
@@ -142,7 +154,7 @@ void MainWindow::paintFractal() {
 }
 
 /**
- * @brief quand on selectionne une zone de l'image
+ * @brief Met à jour le fractal en fonction de la nouvelle selection de l'utilisateur
  * @param start
  * @param end
  */
@@ -175,6 +187,9 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end) {
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
 }
 
+/**
+ * @brief Initialise la barre de menu
+ */
 void MainWindow::setupUi() {
 
     _menu_bar = new QMenuBar(this);
@@ -240,58 +255,65 @@ void MainWindow::setupUi() {
     action = new QAction("Pink", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
-        std::cout << "color mode : " << color_mode << std::endl;
-    });
-
-    action = new QAction("Blue", menu3);
-    menu3->addAction(action);
-    connect(action, &QAction::triggered, this, [this]() {
-        color_mode = 1;
-        std::cout << "color mode : " << color_mode << std::endl;
+        updateColor();
     });
 
     action = new QAction("Green", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
-        color_mode = 2;
-        std::cout << "color mode : " << color_mode << std::endl;
+        color_mode = 1;
+        updateColor();
     });
 
-    action = new QAction("Red", menu3);
+    action = new QAction("Blue", menu3);
+    menu3->addAction(action);
+    connect(action, &QAction::triggered, this, [this]() {
+        color_mode = 2;
+        updateColor();
+    });
+
+    action = new QAction("Purple", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 3;
-        std::cout << "color mode : " << color_mode << std::endl;
+        updateColor();
     });
 
     action = new QAction("Yellow", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 4;
-        std::cout << "color mode : " << color_mode << std::endl;
+        updateColor();
     });
 
     action = new QAction("Purple", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 5;
-        std::cout << "color mode : " << color_mode << std::endl;
+        updateColor();
     });
 
 }
 
+/**
+ * @brief Gère les évènements de la fenêtre
+ * @param event
+ * @return
+ */
 bool MainWindow::event(QEvent *event) {
     if (event->type() == PaintFractalEvent::PaintFractalEventType) {
         paintFractal();
         return true;
     }
-    if(event->type() == QEvent::Close)
-    {
+    if (event->type() == QEvent::Close) {
         Fractalium::MPICalculator::stop();
     }
     return QMainWindow::event(event);
 }
 
+/**
+ * @brief Calcule le fractal en utilisant MPI
+ */
 void MainWindow::mpiCalculate() {
     Fractalium::MPICalculator::mpi_struct = Fractalium::MPIStruct(
             0, _label->width(),
@@ -306,6 +328,9 @@ void MainWindow::mpiCalculate() {
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
 }
 
+/**
+ * @brief Retourne en arrière dans l'historique
+ */
 void MainWindow::back() {
     if (_back_history.empty())
         return;
@@ -318,6 +343,9 @@ void MainWindow::back() {
     _label->setFractal(*_image);
 }
 
+/**
+ * @brief Retourne en avant dans l'historique
+ */
 void MainWindow::front() {
     if (_front_history.empty())
         return;
@@ -330,6 +358,9 @@ void MainWindow::front() {
     _label->setFractal(*_image);
 }
 
+/**
+ * @brief Sauvegarde l'image
+ */
 void MainWindow::saveImage() {
     _image->save("fractal.png");
 }

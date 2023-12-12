@@ -25,11 +25,12 @@ Q_OBJECT
     QMenuBar *_menu_bar;
 
     QImage *_image;
+
     Fractalium::FractalWidget *_label;
 
     std::vector<QColor> _color_map;
-    int DISPLAY_SIZE = 400;
 
+    int DISPLAY_SIZE = 400;
 
     std::pair<Fractalium::Double, Fractalium::Double> _offset = {-2.1, -2};
 
@@ -61,6 +62,8 @@ private:
 
     void saveImage();
 
+    void updateColor();
+
 protected:
     bool event(QEvent *event) override;
 };
@@ -69,8 +72,7 @@ class PaintFractalEvent : public QEvent {
 public:
     static const QEvent::Type PaintFractalEventType = static_cast<QEvent::Type>(QEvent::User + 1);
 
-    explicit PaintFractalEvent() : QEvent(PaintFractalEventType)
-    {}
+    explicit PaintFractalEvent() : QEvent(PaintFractalEventType) {}
 
     ~PaintFractalEvent() override = default;
 };
