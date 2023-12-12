@@ -98,7 +98,6 @@ int Fractal::BurningShip::pointCheck(const Complex &point, int iterations) {
  */
 int Fractal::Newton::pointCheck(const Complex &point, int iterations) {
     Complex z = point;
-
     for (int i = 0; i < iterations; ++i) {
         Complex f_z = z * z * z - Complex(1.0, 0.0);
 
@@ -110,7 +109,6 @@ int Fractal::Newton::pointCheck(const Complex &point, int iterations) {
             return i;
         }
     }
-
     return iterations;
 }
 
