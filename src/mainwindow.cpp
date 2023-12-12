@@ -263,9 +263,10 @@ void MainWindow::setupUi() {
     auto menu3 = new QMenu("Couleur", _menu_bar);
     _menu_bar->addMenu(menu3);
 
-    action = new QAction("Pink", menu3);
+    action = new QAction("Fire", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        color_mode = 0;
         updateColor();
     });
 
@@ -276,28 +277,28 @@ void MainWindow::setupUi() {
         updateColor();
     });
 
-    action = new QAction("Blue", menu3);
+    action = new QAction("Light Green", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 2;
         updateColor();
     });
 
-    action = new QAction("Purple", menu3);
+    action = new QAction("Blue", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 3;
         updateColor();
     });
 
-    action = new QAction("Yellow", menu3);
+    action = new QAction("Purple", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 4;
         updateColor();
     });
 
-    action = new QAction("Purple", menu3);
+    action = new QAction("Pink", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 5;
