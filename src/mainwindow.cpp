@@ -10,7 +10,8 @@ using std::min;
 using std::max;
 using Fractalium::Double;
 
-static unsigned short color_mode = 1;
+static unsigned short color_mode = 0;
+
 
 struct color {
     int r, g, b;
@@ -19,7 +20,7 @@ struct color {
 auto get_color = [](const int &i) -> color {
     color c{};
 
-    const double iteration = static_cast<double>(i) / 200;
+    const double iteration = static_cast<double>(i) / MainWindow::TOTAL_COLORS;
     const double hue = 45.0 + 315.0 * iteration;
     const double C = 1.0 - std::abs(2.0 * iteration - 1.0);
     const double X = C * (1.0 - std::abs(std::fmod(hue / 60.0, 2.0) - 1.0));
@@ -34,8 +35,8 @@ auto get_color = [](const int &i) -> color {
             break;
 
         case 1:
-            c.r = static_cast<int>((X + m) * 255);
-            c.g = static_cast<int>((C + m) * 255);
+            c.r = static_cast<int>(m * 255);
+            c.g = static_cast<int>((C * 0.5 + m) * 255);
             c.b = static_cast<int>(m * 255);
             break;
 
@@ -95,27 +96,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
 
     _step_coord = 4.0 / _label->width();
+    _color_map = std::vector<QColor>(MainWindow::TOTAL_COLORS);
 
-    _color_map = std::vector<QColor>(200);
-
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < MainWindow::TOTAL_COLORS; i++) {
         c = get_color(i);
         _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
     }
 
     _color_map.emplace_back(QColor::fromRgb(0, 0, 0).name());
-
-
     _image = new QImage(_label->width(), _label->height(), QImage::Format_RGB32);
-
     _divergence_image = Fractalium::Image(_label->width(), _label->height());
 
     setupUi();
 
     _fractal = new Fractalium::Fractal();
-
     connect(_label, &Fractalium::FractalWidget::newSelection, this, &MainWindow::newSelection);
-
     Fractalium::MPICalculator::signal.connect([this] {
         qApp->postEvent(this, new PaintFractalEvent);
     });
@@ -126,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
  * @brief Met à jour la couleur du fractal quand l'utilisateur change de couleur
  */
 void MainWindow::updateColor() {
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < MainWindow::TOTAL_COLORS; i++) {
         c = get_color(i);
         _color_map[i] = QColor::fromRgb(c.r, c.g, c.b).name();
     }
@@ -145,7 +140,7 @@ void MainWindow::paintFractal() {
     for (uint16_t x = start_x; x < end_x; ++x) {
         for (uint16_t y = start_y; y < end_y; ++y) {
             if (_divergence_image.getPixel(x, y) == -1) continue;
-            _image->setPixelColor(x, y, _color_map[min(_divergence_image.getPixel(x, y), 199)]);
+            _image->setPixelColor(x, y, _color_map[min(_divergence_image.getPixel(x, y), MainWindow::TOTAL_COLORS)]);
         }
     }
     _back_history.emplace_back(history{*_image, _offset, _step_coord});
@@ -338,8 +333,7 @@ void MainWindow::mpiCalculate() {
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
 }
 
-void MainWindow::back()
-{
+void MainWindow::back() {
     if (_back_history.empty())
         return;
     _back_history.pop_back();
@@ -371,8 +365,8 @@ void MainWindow::front() {
  */
 void MainWindow::saveImage() {
     auto fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
-                                                    QDir::homePath()+"/fractal.png",
-                                                    tr("Images (*.png *.xpm *.jpg)"));
-    if(fileName.isEmpty()) return;
+                                                 QDir::homePath() + "/fractal.png",
+                                                 tr("Images (*.png *.xpm *.jpg)"));
+    if (fileName.isEmpty()) return;
     _image->save(fileName);
 }

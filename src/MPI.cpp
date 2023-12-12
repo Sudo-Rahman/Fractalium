@@ -83,7 +83,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         {
             mpi_tmp.start_x = x_delta / (world.size() - 1) * proc;
             mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
-            world.isend(proc + 1, 0, mpi_tmp);
+            world.send(proc + 1, 0, mpi_tmp);
         }
         receive(image);
     }

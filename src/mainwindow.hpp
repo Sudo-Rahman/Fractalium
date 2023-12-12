@@ -30,7 +30,7 @@ Q_OBJECT
 
     std::vector<QColor> _color_map;
 
-    int DISPLAY_SIZE = 400;
+    int DISPLAY_SIZE = 800;
 
     std::pair<Fractalium::Double, Fractalium::Double> _offset = {-2.1, -2};
 
@@ -46,6 +46,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow() override = default;
+
+    static const int TOTAL_COLORS = 500;
 
 private:
     void paintFractal();
