@@ -4,6 +4,7 @@
 #include <chrono>
 #include <QApplication>
 #include <MPI.hpp>
+#include <QFileDialog>
 
 using std::min;
 using std::max;
@@ -165,7 +166,7 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end) {
             _offset.first + start.x() * _step_coord;
     // on calcule le nouveau offset y
     _offset.second =
-            _offset.second + start.y() * _step_coord;
+            _offset.second + start.y() * _step_coord + (_step_coord * _label->height() / _label->width());
 
     // on calcule le nouveau step_coord
     int xDelta = abs(end.x() - start.x()), yDelta = abs(end.y() - start.y());
@@ -201,6 +202,8 @@ void MainWindow::setupUi() {
     auto *action = new QAction("Mandelbrot", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        _offset = {-2.1, -2};
+        _step_coord = 3.5 / _label->width();
         *_fractal = Fractalium::Fractal();
         mpiCalculate();
     });
@@ -208,6 +211,8 @@ void MainWindow::setupUi() {
     action = new QAction("Julia", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        _offset = {-2.1, -2};
+        _step_coord = 3.5 / _label->width();
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Julia);
         mpiCalculate();
     });
@@ -215,6 +220,8 @@ void MainWindow::setupUi() {
     action = new QAction("BurningShip", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        _offset = {-2.2, -2};
+        _step_coord = 3.2 / _label->width();
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::BurningShip);
         mpiCalculate();
     });
@@ -222,6 +229,8 @@ void MainWindow::setupUi() {
     action = new QAction("Newton", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        _offset = {-3, -3};
+        _step_coord = 6.0 / _label->width();
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Newton);
         mpiCalculate();
     });
@@ -230,6 +239,8 @@ void MainWindow::setupUi() {
     action = new QAction("Koch", menu);
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
+        _offset = {-5, -5};
+        _step_coord = 10.0 / _label->width();
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Koch);
         mpiCalculate();
     });
@@ -328,14 +339,12 @@ void MainWindow::mpiCalculate() {
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
 }
 
-/**
- * @brief Retourne en arrière dans l'historique
- */
-void MainWindow::back() {
+void MainWindow::back()
+{
     if (_back_history.empty())
         return;
-    auto h = _back_history.back();
     _back_history.pop_back();
+    auto h = _back_history.back();
     _front_history.emplace_back(history{*_image, _offset, _step_coord});
     _offset = h.offset;
     _step_coord = h.step_coord;
@@ -349,8 +358,8 @@ void MainWindow::back() {
 void MainWindow::front() {
     if (_front_history.empty())
         return;
-    auto h = _front_history.back();
     _front_history.pop_back();
+    auto h = _front_history.back();
     _back_history.emplace_back(history{*_image, _offset, _step_coord});
     _offset = h.offset;
     _step_coord = h.step_coord;
@@ -362,5 +371,9 @@ void MainWindow::front() {
  * @brief Sauvegarde l'image
  */
 void MainWindow::saveImage() {
-    _image->save("fractal.png");
+    auto fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                                                    QDir::homePath()+"/fractal.png",
+                                                    tr("Images (*.png *.xpm *.jpg)"));
+    if(fileName.isEmpty()) return;
+    _image->save(fileName);
 }
