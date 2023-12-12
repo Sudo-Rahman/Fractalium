@@ -38,7 +38,7 @@ Q_OBJECT
 
     Fractalium::Fractal *_fractal;
 
-    Fractalium::Image _diergence_image;
+    Fractalium::Image _divergence_image;
 
     std::vector<history> _back_history, _front_history;
 

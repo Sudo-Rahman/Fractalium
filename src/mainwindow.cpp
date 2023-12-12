@@ -9,7 +9,7 @@ using std::min;
 using std::max;
 using Fractalium::Double;
 
-static unsigned short color_mode = 0;
+static unsigned short color_mode = 1;
 
 struct color {
     int r, g, b;
@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     _image = new QImage(_label->width(), _label->height(), QImage::Format_RGB32);
 
-    _diergence_image = Fractalium::Image(_label->width(), _label->height());
+    _divergence_image = Fractalium::Image(_label->width(), _label->height());
 
     setupUi();
 
@@ -137,16 +137,14 @@ void MainWindow::updateColor() {
 void MainWindow::paintFractal() {
     uint16_t start_x, end_x, end_y, start_y;
     start_x = 0;
-    end_x = _diergence_image.width();
+    end_x = _divergence_image.width();
     start_y = 0;
-    end_y = _diergence_image.height();
+    end_y = _divergence_image.height();
 
     for (uint16_t x = start_x; x < end_x; ++x) {
         for (uint16_t y = start_y; y < end_y; ++y) {
-            if (_diergence_image.getPixel(x, y) == -1)
-                continue;
-            int q = _diergence_image.getPixel(x, y);
-            _image->setPixelColor(x, y, _color_map[q]);
+            if (_divergence_image.getPixel(x, y) == -1) continue;
+            _image->setPixelColor(x, y, _color_map[min(_divergence_image.getPixel(x, y), 199)]);
         }
     }
     _back_history.emplace_back(history{*_image, _offset, _step_coord});
@@ -184,7 +182,7 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end) {
             *_fractal
     );
 
-    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
+    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
 }
 
 /**
@@ -326,7 +324,7 @@ void MainWindow::mpiCalculate() {
             _step_coord,
             *_fractal
     );
-    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _diergence_image);
+    Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
 }
 
 /**
