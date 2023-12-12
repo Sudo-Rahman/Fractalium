@@ -30,7 +30,7 @@ Q_OBJECT
 
     std::vector<QColor> _color_map;
 
-    int DISPLAY_SIZE = 800;
+    int DISPLAY_SIZE = 400;
 
     std::pair<Fractalium::Double, Fractalium::Double> _offset = {-2.1, -2};
 
