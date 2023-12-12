@@ -18,7 +18,7 @@ struct color {
 auto get_color = [](const int &i) -> color {
     color c{};
 
-    const double iteration = static_cast<double>(i) / Fractalium::Fractal::ITERATIONS;
+    const double iteration = static_cast<double>(i) / 200;
     const double hue = 45.0 + 315.0 * iteration;
     const double C = 1.0 - std::abs(2.0 * iteration - 1.0);
     const double X = C * (1.0 - std::abs(std::fmod(hue / 60.0, 2.0) - 1.0));
