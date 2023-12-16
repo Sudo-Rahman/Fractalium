@@ -5,8 +5,7 @@
 
 #include <Double.hpp>
 
-namespace Fractalium
-{
+namespace Fractalium {
 
     class Complex {
     public:
@@ -15,7 +14,6 @@ namespace Fractalium
         Complex(Double r, Double i);
 
         Complex();
-
 
         Complex &operator=(Complex const &obj);
 

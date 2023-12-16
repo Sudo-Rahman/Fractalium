@@ -9,8 +9,7 @@
 #include <QLabel>
 #include <QRubberBand>
 
-namespace Fractalium
-{
+namespace Fractalium {
 
     class FractalWidget : public QLabel {
     Q_OBJECT
@@ -21,9 +20,7 @@ namespace Fractalium
 
         QPoint _start_point, _release_point;
 
-
         void setPixmap(const QPixmap &pixmap);
-
 
     public:
         explicit FractalWidget(QWidget *parent = nullptr);
