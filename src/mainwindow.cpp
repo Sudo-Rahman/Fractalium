@@ -3,8 +3,10 @@
 #include <iostream>
 #include <chrono>
 #include <QApplication>
+#include <IterationDialog.hpp>
 #include <MPI.hpp>
 #include <QFileDialog>
+#include <ResizeDialog.hpp>
 
 using std::min;
 using std::max;
@@ -83,11 +85,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     _label = new Fractalium::FractalWidget(central);
     _label->setAlignment(Qt::AlignCenter);
-    _label->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
-    _label->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    _label->setFixedSize(DISPLAY_SIZE_WIDTH, DISPLAY_SIZE_HEIGHT);
 
-    this->setMinimumSize(DISPLAY_SIZE, DISPLAY_SIZE);
-    this->setMaximumSize(DISPLAY_SIZE, DISPLAY_SIZE);
+    this->setFixedSize(DISPLAY_SIZE_WIDTH, DISPLAY_SIZE_HEIGHT);
 
     _color_map = std::vector<QColor>(MainWindow::TOTAL_COLORS);
 
@@ -336,6 +336,32 @@ void MainWindow::setupUi() {
         updateColor();
     });
 
+    auto menu4 = new QMenu("Options",_menu_bar);
+    _menu_bar->addMenu(menu4);
+
+    auto resize = new QAction("Resize");
+    connect(resize, &QAction::triggered, this, [this]() {
+        auto dialog = ResizeDialog(400,3840,this);
+        dialog.exec();
+        if(dialog.returnType() == ResizeDialog::Return::OK){
+            auto size = dialog.returnSize();
+            this->setFixedSize(size);
+            this->_label->setFixedSize(size);
+            *_image = QImage(size,QImage::Format_RGB32);
+            _divergence_image =  Fractalium::Image(size.width(),size.height());
+        }
+    });
+    menu4->addAction(resize);
+
+    auto iterations = new QAction("Iteration");
+    connect(iterations, &QAction::triggered, this, [this]() {
+        auto dialog = IterationDialog(Fractalium::Fractal::ITERATIONS,this);
+        dialog.exec();
+        if(dialog.returnType() == IterationDialog::Return::OK){
+            Fractalium::Fractal::ITERATIONS = dialog.iteration();
+        }
+    });
+    menu4->addAction(iterations);
 }
 
 /**
