@@ -75,7 +75,8 @@ class PaintFractalEvent : public QEvent {
 public:
     static const QEvent::Type PaintFractalEventType = static_cast<QEvent::Type>(QEvent::User + 1);
 
-    explicit PaintFractalEvent() : QEvent(PaintFractalEventType) {}
+    explicit PaintFractalEvent() : QEvent(PaintFractalEventType)
+    {}
 
     ~PaintFractalEvent() override = default;
 };

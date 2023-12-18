@@ -24,7 +24,7 @@ namespace Fractalium
 
         Image(Image &&other) noexcept;
 
-        Image& operator=(const Image& other);
+        Image &operator=(const Image &other);
 
         explicit Image(uint32_t width, uint32_t height);
 

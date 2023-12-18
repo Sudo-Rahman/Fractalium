@@ -10,7 +10,8 @@
 #include <boost/serialization/serialization.hpp>
 
 
-namespace Fractalium {
+namespace Fractalium
+{
 
 
     class Fractal {
@@ -25,17 +26,20 @@ namespace Fractalium {
             Koch
         };
 
-        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type) {}
+        explicit Fractal(FractalType type = FractalType::Mandelbrot) : _type(type)
+        {}
 
         [[nodiscard]] int pointCheck(const Complex &pointm, int iterations) const;
 
         static uint64_t ITERATIONS;
 
-        void setType(FractalType type) {
+        void setType(FractalType type)
+        {
             _type = type;
         }
 
-        [[nodiscard]] FractalType getType() const {
+        [[nodiscard]] FractalType getType() const
+        {
             return _type;
         }
 
@@ -47,7 +51,8 @@ namespace Fractalium {
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive &ar, const unsigned int version) {
+        void serialize(Archive &ar, const unsigned int version)
+        {
             ar & _type;
         }
 

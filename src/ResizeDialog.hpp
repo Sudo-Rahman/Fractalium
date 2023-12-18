@@ -18,19 +18,20 @@ public:
         OK, NO_OK
     };
 
-    explicit ResizeDialog(uint16_t min, uint16_t max, QWidget *parent = nullptr);
+    explicit ResizeDialog(const QSize &current, QWidget *parent = nullptr);
 
     [[nodiscard]] Return returnType() const
     { return _return; }
 
-    [[nodiscard]] QSize returnSize() const {
-        return {_w,_h};
+    [[nodiscard]] QSize returnSize() const
+    {
+        return {_w, _h};
     }
 
 private:
     QPushButton *_save;
     QSpinBox *_width, *_height;
-    uint16_t _w,_h;
+    uint16_t _w, _h;
     Return _return{Return::NO_OK};
 
 };

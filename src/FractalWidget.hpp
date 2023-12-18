@@ -9,7 +9,8 @@
 #include <QLabel>
 #include <QRubberBand>
 
-namespace Fractalium {
+namespace Fractalium
+{
 
     class FractalWidget : public QLabel {
     Q_OBJECT

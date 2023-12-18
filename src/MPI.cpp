@@ -56,10 +56,8 @@ void Fractalium::MPICalculator::receive(Image &image)
         auto counter = new std::atomic<uint16_t>(0);
         for (int proc = 1; proc < world.size(); ++proc)
         {
-            cout << "risogjr"<< endl;
             auto image_tmp = Image();
             world.recv(proc, 1, image_tmp);
-            cout << "risogjr"<< endl;
             image.merge(image_tmp);
             (*counter)++;
             if (*counter == world.size() - 1)
@@ -87,7 +85,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         for (int proc = 0; proc < world.size() - 1; ++proc)
         {
             mpi_tmp.start_x = x_delta / (world.size() - 1) * proc;
-            if(proc == world.size()-1) mpi_tmp.end_x = mpi_tmp.end_x;
+            if (proc == world.size() - 1) mpi_tmp.end_x = mpi_tmp.end_x;
             else mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
             world.send(proc + 1, 0, mpi_tmp);
         }

@@ -5,7 +5,8 @@
 
 #include <Double.hpp>
 
-namespace Fractalium {
+namespace Fractalium
+{
 
     class Complex {
     public:

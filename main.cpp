@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
             frac::MPIStruct mpiStruct;
             {
                 world.recv(0, 0, mpiStruct);
-                std::cout << "received: " << world.rank() << std::endl;
             }
             Fractalium::MPICalculator::mpi_struct = mpiStruct; // Enregistrement des données reçues dans l'objet MPICalculator
             auto image = Fractalium::Image(mpiStruct.width, mpiStruct.height); // Création d'une image fractale

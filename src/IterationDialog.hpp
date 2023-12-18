@@ -15,7 +15,7 @@ Q_OBJECT
 
 public:
 
-    explicit IterationDialog(uint64_t val,QWidget *parent);
+    explicit IterationDialog(uint64_t val, QWidget *parent);
 
     enum class Return {
         OK, NO_OK

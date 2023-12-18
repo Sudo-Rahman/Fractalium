@@ -42,7 +42,7 @@ void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
          || event->pos().y() < 0
          || event->pos().x() > QWidget::width()
          || event->pos().y() > QWidget::height())
-         )
+            )
         return;
 
     _release_point = event->pos();

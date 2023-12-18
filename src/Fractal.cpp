@@ -17,8 +17,10 @@ Complex Fractal::Julia::juliaConstant = {0.285, 0.01};
  * @param iterations
  * @return
  */
-int Fractal::pointCheck(const Complex &point, int iterations) const {
-    switch (_type) {
+int Fractal::pointCheck(const Complex &point, int iterations) const
+{
+    switch (_type)
+    {
         case FractalType::Mandelbrot:
             return Mandelbrot::pointCheck(point, iterations);
         case FractalType::Julia:
@@ -39,10 +41,12 @@ int Fractal::pointCheck(const Complex &point, int iterations) const {
  * @param iterations
  * @return
  */
-int Fractal::Julia::pointCheck(const Complex &point, int iterations) {
+int Fractal::Julia::pointCheck(const Complex &point, int iterations)
+{
     Complex z = point;
     int i;
-    for (i = 0; i < iterations; ++i) {
+    for (i = 0; i < iterations; ++i)
+    {
         boost::this_thread::interruption_point();
         z *= z += Fractal::Julia::juliaConstant;
         if (z.norm() > 2.0)
@@ -57,10 +61,12 @@ int Fractal::Julia::pointCheck(const Complex &point, int iterations) {
  * @param iterations
  * @return int
  */
-int Fractal::Mandelbrot::pointCheck(const Complex &point, int iterations) {
+int Fractal::Mandelbrot::pointCheck(const Complex &point, int iterations)
+{
     int i;
     Complex z = Complex(0, 0);
-    for (i = 0; i < iterations; ++i) {
+    for (i = 0; i < iterations; ++i)
+    {
         boost::this_thread::interruption_point();
         z *= z += point;
         if (z.norm() > 2.0)
@@ -76,10 +82,12 @@ int Fractal::Mandelbrot::pointCheck(const Complex &point, int iterations) {
  * @param iterations
  * @return
  */
-int Fractal::BurningShip::pointCheck(const Complex &point, int iterations) {
+int Fractal::BurningShip::pointCheck(const Complex &point, int iterations)
+{
     int i;
     Complex z = Complex(0, 0);
-    for (i = 0; i < iterations; ++i) {
+    for (i = 0; i < iterations; ++i)
+    {
         boost::this_thread::interruption_point();
         z.real = abs(z.real);
         z.imag = abs(z.imag);
@@ -96,16 +104,19 @@ int Fractal::BurningShip::pointCheck(const Complex &point, int iterations) {
  * @param iterations
  * @return
  */
-int Fractal::Newton::pointCheck(const Complex &point, int iterations) {
+int Fractal::Newton::pointCheck(const Complex &point, int iterations)
+{
     Complex z = point;
-    for (int i = 0; i < iterations; ++i) {
+    for (int i = 0; i < iterations; ++i)
+    {
         Complex f_z = z * z * z - Complex(1.0, 0.0);
 
         Complex f_prime = Complex(3.0, 0.0) * z * z;
 
         z = z - f_z / f_prime;
 
-        if (f_z.norm() < 1e-6) {
+        if (f_z.norm() < 1e-6)
+        {
             return i;
         }
     }
@@ -118,13 +129,16 @@ int Fractal::Newton::pointCheck(const Complex &point, int iterations) {
  * @param iterations
  * @return
  */
-int Fractal::Koch::pointCheck(const Fractalium::Complex &point, int iterations) {
+int Fractal::Koch::pointCheck(const Fractalium::Complex &point, int iterations)
+{
     Complex z = point;
-    for (int i = 0; i < iterations; ++i) {
+    for (int i = 0; i < iterations; ++i)
+    {
         Complex f_z = z * z * z * z - Complex(1.0, 0.0);
         Complex f_prime = Complex(4.0, 0.0) * z * z * z;
         z = z - f_z / f_prime;
-        if (f_z.norm() < 1e-6) {
+        if (f_z.norm() < 1e-6)
+        {
             return i;
         }
     }

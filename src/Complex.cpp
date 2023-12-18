@@ -38,7 +38,8 @@ Double Complex::norm() const
  */
 Complex &Complex::operator=(const Complex &obj)
 {
-    if (this != &obj) { // Vérifier l'auto-affectation
+    if (this != &obj)
+    { // Vérifier l'auto-affectation
         real = obj.real;
         imag = obj.imag;
     }
@@ -92,7 +93,7 @@ Complex Complex::operator/(Complex const &obj) const
  * @param obj  Nombre complexe à comparer
  * @return  bool
  */
-Complex& Complex::operator+=(const Complex &obj)
+Complex &Complex::operator+=(const Complex &obj)
 {
     *this = this->operator+(obj);
     return *this;
@@ -114,7 +115,7 @@ Complex &Complex::operator-=(const Complex &obj)
  * @param obj  Nombre complexe à comparer
  * @return  bool
  */
-Complex& Complex::operator*=(const Complex &obj)
+Complex &Complex::operator*=(const Complex &obj)
 {
     *this = this->operator*(obj);
     return *this;
