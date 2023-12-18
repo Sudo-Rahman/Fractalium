@@ -10,7 +10,7 @@ using std::min;
 using std::max;
 using Fractalium::Double;
 
-static unsigned short color_mode = 0;
+unsigned short color_mode = 0;
 
 
 struct color {
@@ -28,51 +28,45 @@ auto get_color = [](const int &i) -> color {
 
     switch (color_mode) {
 
-        case 0:
+        case 1:
             c.r = static_cast<int>((C + m) * 255);
             c.g = static_cast<int>((X + m) * 255);
-            c.b = static_cast<int>(m * 255);
-            break;
-
-        case 1:
-            c.r = static_cast<int>(m * 255);
-            c.g = static_cast<int>((C * 0.5 + m) * 255);
             c.b = static_cast<int>(m * 255);
             break;
 
         case 2:
             c.r = static_cast<int>(m * 255);
+            c.g = static_cast<int>((C * 0.5 + m) * 255);
+            c.b = static_cast<int>(m * 255);
+            break;
+
+        case 3:
+            c.r = static_cast<int>(m * 255);
             c.g = static_cast<int>((C + m) * 255);
             c.b = static_cast<int>((X + m) * 255);
             break;
 
-        case 3:
+        case 4:
             c.r = static_cast<int>(m * 255);
             c.g = static_cast<int>((X + m) * 255);
             c.b = static_cast<int>((C + m) * 255);
             break;
 
-        case 4:
+        case 5:
             c.r = static_cast<int>((X + m) * 255);
             c.g = static_cast<int>(m * 255);
             c.b = static_cast<int>((C + m) * 255);
             break;
 
-        case 5:
+        case 6:
             c.r = static_cast<int>((C + m) * 255);
             c.g = static_cast<int>(m * 255);
             c.b = static_cast<int>((X + m) * 255);
             break;
 
-        case 6:
+        case 7:
             c.r = static_cast<int>((C + m) * 255);
             c.g = static_cast<int>((C + m) * 255);
-            c.b = static_cast<int>(m * 255);
-            break;
-
-        default:
-            c.r = static_cast<int>((C + m) * 255);
-            c.g = static_cast<int>((X + m) * 255);
             c.b = static_cast<int>(m * 255);
             break;
     }
@@ -126,20 +120,59 @@ void MainWindow::updateColor() {
     }
 }
 
+
+color getColorForDivergence(const int divergence, const int maxDivergence) {
+    srand(time(nullptr));
+    const int red = rand() % 10 + 1;
+    const int green = rand() % 10 + 1;
+    const int blue = rand() % 10 + 1;
+
+    if (divergence == maxDivergence) {
+        return {255, 255, 255};
+    } else {
+        const int r = static_cast<int>(std::min((divergence + 1) * std::round(red / 2.0), 255.0));
+        const int g = static_cast<int>(std::min((divergence + 1) * std::round(green / 4.0), 255.0));
+        const int b = static_cast<int>(std::min((divergence + 1) * std::round(blue / 3.0), 255.0));
+        return {r, g, b};
+    }
+}
+
+
 /**
  * @brief Peint le fractal dans l'image
  */
 void MainWindow::paintFractal() {
     uint16_t start_x, end_x, end_y, start_y;
     start_x = 0;
-    end_x = _divergence_image.width();
     start_y = 0;
+    end_x = _divergence_image.width();
     end_y = _divergence_image.height();
+    if (color_mode == 0) { // Dynamique color mode (couleur en fonction de la divergence)
+        int maxDivergence = 0;
+        for (uint16_t x = start_x; x < end_x; ++x) {
+            for (uint16_t y = start_y; y < end_y; ++y) {
+                if (_divergence_image.getPixel(x, y) > maxDivergence) {
+                    maxDivergence = _divergence_image.getPixel(x, y);
+                }
+            }
+        }
+        color color{};
+        std::cout << "max divergence: " << maxDivergence << std::endl;
+        for (uint16_t x = start_x; x < end_x; ++x) {
+            for (uint16_t y = start_y; y < end_y; ++y) {
+                if (_divergence_image.getPixel(x, y) == -1) continue;
+                color = getColorForDivergence(_divergence_image.getPixel(x, y), maxDivergence);
+                _image->setPixelColor(x, y, QColor::fromRgb(color.r, color.g, color.b));
+            }
+        }
 
-    for (uint16_t x = start_x; x < end_x; ++x) {
-        for (uint16_t y = start_y; y < end_y; ++y) {
-            if (_divergence_image.getPixel(x, y) == -1) continue;
-            _image->setPixelColor(x, y, _color_map[min(_divergence_image.getPixel(x, y), MainWindow::TOTAL_COLORS)]);
+    } else { // color_mode != 0 donc on utilise la palette de couleur
+        for (uint16_t x = start_x; x < end_x; ++x) {
+            for (uint16_t y = start_y; y < end_y; ++y) {
+                if (_divergence_image.getPixel(x, y) == -1) continue;
+                _image->setPixelColor(x, y,
+                                      _color_map[min(_divergence_image.getPixel(x, y), MainWindow::TOTAL_COLORS)]);
+            }
         }
     }
     _back_history.emplace_back(history{*_image, _offset, _step_coord});
@@ -153,10 +186,10 @@ void MainWindow::paintFractal() {
  */
 void MainWindow::newSelection(const QPoint &start, const QPoint &end) {
 
-    // on calcule le nouveau offset x
+    // on calcule le nouvel offset x
     _offset.first =
             _offset.first + start.x() * _step_coord;
-    // on calcule le nouveau offset y
+    // on calcule le nouvel offset y
     _offset.second =
             _offset.second + start.y() * _step_coord + (_step_coord * _label->height() / _label->width());
 
@@ -255,45 +288,51 @@ void MainWindow::setupUi() {
     auto menu3 = new QMenu("Couleur", _menu_bar);
     _menu_bar->addMenu(menu3);
 
-    action = new QAction("Fire", menu3);
+    action = new QAction("Dynamique", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 0;
-        updateColor();
     });
 
-    action = new QAction("Green", menu3);
+    action = new QAction("Fire", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 1;
         updateColor();
     });
 
-    action = new QAction("Light Green", menu3);
+    action = new QAction("Green", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 2;
         updateColor();
     });
 
-    action = new QAction("Blue", menu3);
+    action = new QAction("Light Green", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 3;
         updateColor();
     });
 
-    action = new QAction("Purple", menu3);
+    action = new QAction("Blue", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 4;
         updateColor();
     });
 
-    action = new QAction("Pink", menu3);
+    action = new QAction("Purple", menu3);
     menu3->addAction(action);
     connect(action, &QAction::triggered, this, [this]() {
         color_mode = 5;
+        updateColor();
+    });
+
+    action = new QAction("Pink", menu3);
+    menu3->addAction(action);
+    connect(action, &QAction::triggered, this, [this]() {
+        color_mode = 6;
         updateColor();
     });
 
@@ -332,6 +371,10 @@ void MainWindow::mpiCalculate() {
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
 }
 
+/**
+ * @brief Retourne en arrière dans l'historique du fractal
+
+ */
 void MainWindow::back() {
     if (_back_history.size() <= 1)
         return;
