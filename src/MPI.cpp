@@ -10,7 +10,11 @@ using std::cout;
 using std::endl;
 Fractalium::MPIStruct Fractalium::MPICalculator::mpi_struct;
 uint16_t Fractalium::MPICalculator::rank = 0;
-boost::signals2::signal<void()> Fractalium::MPICalculator::signal;
+boost::signals2::signal<void()> Fractalium::MPICalculator::finshed;
+boost::signals2::signal<void(uint32_t)> Fractalium::MPICalculator::node_recived;
+std::future<void> Fractalium::MPICalculator::future;
+bool Fractalium::MPICalculator::is_running = false;
+uint32_t Fractalium::MPICalculator::node_count = 0;
 
 /**
  * @brief Constructeur de la classe MPICalculator
@@ -19,6 +23,7 @@ boost::signals2::signal<void()> Fractalium::MPICalculator::signal;
 Fractalium::MPICalculator::MPICalculator(uint16_t rank)
 {
     MPICalculator::rank = rank;
+    node_count = mpi::communicator().size();
 }
 
 /**
@@ -60,9 +65,11 @@ void Fractalium::MPICalculator::receive(Image &image)
             world.recv(proc, 1, image_tmp);
             image.merge(image_tmp);
             (*counter)++;
+            node_recived(*counter);
             if (*counter == world.size() - 1)
             {
-                signal();
+                is_running = false;
+                finshed();
                 counter->store(0);
             }
         }
@@ -87,8 +94,12 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
             mpi_tmp.start_x = x_delta / (world.size() - 1) * proc;
             mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
             world.send(proc + 1, 0, mpi_tmp);
+            is_running = true;
         }
-        receive(image);
+        future = std::async(std::launch::async, [&]()
+        {
+            receive(image);
+        });
     }
 }
 

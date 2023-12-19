@@ -6,8 +6,10 @@
 #include <QColor>
 #include <QMouseEvent>
 #include <QPoint>
+#include <QProgressBar>
 #include <QImage>
 #include <QMenuBar>
+#include <QStatusBar>
 #include "FractalWidget.hpp"
 #include "Fractal.hpp"
 #include "Image.hpp"
@@ -24,6 +26,8 @@ Q_OBJECT
 
     QMenuBar *_menu_bar;
 
+    QStatusBar *_status_bar;
+
     QImage *_image;
 
     Fractalium::FractalWidget *_label;
@@ -31,7 +35,7 @@ Q_OBJECT
     std::vector<QColor> _color_map;
 
     uint16_t DISPLAY_SIZE_WIDTH = 400;
-    uint16_t DISPLAY_SIZE_HEIGHT = 400;
+    uint16_t DISPLAY_SIZE_HEIGHT = 450;
 
     std::pair<Fractalium::Double, Fractalium::Double> _offset = {-2.1, -2};
 
