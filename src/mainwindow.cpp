@@ -1,28 +1,25 @@
-#include <QRubberBand>
 #include "mainwindow.hpp"
 #include <iostream>
-#include <chrono>
 #include <QApplication>
 #include <IterationDialog.hpp>
 #include <MPI.hpp>
 #include <QFileDialog>
 #include <ResizeDialog.hpp>
 #include <QLayout>
+#include <Color.hpp>
+#include <SnapshotDialog.hpp>
 
 using std::min;
 using std::max;
 using Fractalium::Double;
+using Fractalium::Color;
 
 unsigned short color_mode = 0;
 
 
-struct color {
-    int r, g, b;
-};
-
-auto get_color = [](const int &i) -> color
+auto get_color = [](const int &i) -> Color
 {
-    color c{};
+    Color c{};
 
     const double iteration = static_cast<double>(i) / MainWindow::TOTAL_COLORS;
     const double hue = 45.0 + 315.0 * iteration;
@@ -79,10 +76,13 @@ auto get_color = [](const int &i) -> color
     return c;
 };
 
-color c{};
+Color c{};
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+
+    setWindowTitle("Fractalium");
+
     auto *central = new QWidget(this);
     this->setCentralWidget(central);
 
@@ -108,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     _color_map = std::vector<QColor>(MainWindow::TOTAL_COLORS);
 
+//    initilisation de la palette de couleur
     for (int i = 0; i < MainWindow::TOTAL_COLORS; i++)
     {
         c = get_color(i);
@@ -153,10 +154,13 @@ void MainWindow::updateColor()
  * @param blue
  * @return
  */
-color getColorForDivergence(int divergence, int maxDivergence, int red, int green, int blue) {
-    if (divergence == maxDivergence) {
+Color getColorForDivergence(int divergence, int maxDivergence, int red, int green, int blue)
+{
+    if (divergence == maxDivergence)
+    {
         return {0, 0, 0};
-    } else {
+    } else
+    {
         const double factor = (divergence + 1) / 3.0;
         const int r = std::clamp(static_cast<int>(std::lround(factor * red)), 0, 255);
         const int g = std::clamp(static_cast<int>(std::lround(factor * green)), 0, 255);
@@ -189,7 +193,7 @@ void MainWindow::paintFractal()
                 }
             }
         }
-        color color{};
+        Color color{};
         srand(time(nullptr));
         const int red = rand() % 10 + 1;
         const int green = rand() % 10 + 1;
@@ -217,7 +221,7 @@ void MainWindow::paintFractal()
             }
         }
     }
-    _back_history.emplace_back(history{*_image, _offset, _step_coord});
+    _back_history.emplace_back(Fractalium::History{*_image, _offset, _step_coord});
     _label->setFractal(*_image);
 }
 
@@ -261,7 +265,7 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 }
 
 /**
- * @brief Initialise la barre de menu
+ * @brief Creation de la barre de menu
  */
 void MainWindow::setupUi()
 {
@@ -286,7 +290,7 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        _offset = {-2.1, -2};
+        _offset = {-2.1, -2.0};
         _step_coord = max(3.5 / _label->width(), 3.5 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Julia);
         mpiCalculate();
@@ -296,8 +300,8 @@ void MainWindow::setupUi()
     menu->addAction(action);
     connect(action, &QAction::triggered, this, [this]()
     {
-        _offset = {-2.2, -2};
-        _step_coord = max(3.2 / _label->width(), 3.2 / _label->height());
+        _offset = {-2.0, -2.0};
+        _step_coord = max(3.0 / _label->width(), 3.0 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::BurningShip);
         mpiCalculate();
     });
@@ -323,20 +327,41 @@ void MainWindow::setupUi()
         mpiCalculate();
     });
 
-    auto *menu2 = new QMenu("History", _menu_bar);
+    auto *menu2 = new QMenu("Historique", _menu_bar);
     _menu_bar->addMenu(menu2);
 
-    action = new QAction("Back", menu2);
+    action = new QAction("Arrière", menu2);
     menu2->addAction(action);
     connect(action, &QAction::triggered, this, &MainWindow::back);
 
-    action = new QAction("Front", menu2);
+    action = new QAction("Avant", menu2);
     menu2->addAction(action);
     connect(action, &QAction::triggered, this, &MainWindow::front);
 
-    action = new QAction("Save", menu2);
+    action = new QAction("Enregistrer", menu2);
     menu2->addAction(action);
     connect(action, &QAction::triggered, this, &MainWindow::saveImage);
+
+    action = new QAction("Instanté", menu2);
+    menu2->addAction(action);
+    connect(action, &QAction::triggered, this, [this]()
+    {
+        auto snap = Fractalium::SnapshotHistory(_back_history, _front_history, *_fractal);
+        auto dialog = SnapshotDialog(snap, this);
+        dialog.exec();
+        if (dialog.returnType() == SnapshotDialog::Return::Import)
+        {
+            delete _fractal;
+            _fractal = new Fractalium::Fractal(snap.fractal);
+            _back_history = snap.history_back;
+            _front_history = snap.history_front;
+            auto h = _back_history.back();
+            _offset = h.offset;
+            _step_coord = h.step_coord;
+            *_image = h.image.toQImage();
+            _label->setFractal(*_image);
+        }
+    });
 
     auto menu3 = new QMenu("Couleur", _menu_bar);
     _menu_bar->addMenu(menu3);
@@ -474,12 +499,12 @@ void MainWindow::back()
 {
     if (_back_history.size() <= 1)
         return;
-    _front_history.emplace_back(history{*_image, _offset, _step_coord});
+    _front_history.emplace_back(Fractalium::History{*_image, _offset, _step_coord});
     _back_history.pop_back();
     auto h = _back_history.back();
     _offset = h.offset;
     _step_coord = h.step_coord;
-    *_image = h.image;
+    *_image = h.image.toQImage();
     _label->setFractal(*_image);
 }
 
@@ -494,8 +519,8 @@ void MainWindow::front()
     _front_history.pop_back();
     _offset = h.offset;
     _step_coord = h.step_coord;
-    *_image = h.image;
-    _back_history.emplace_back(history{*_image, _offset, _step_coord});
+    *_image = h.image.toQImage();
+    _back_history.emplace_back(Fractalium::History{*_image, _offset, _step_coord});
     _label->setFractal(*_image);
 }
 
@@ -504,7 +529,7 @@ void MainWindow::front()
  */
 void MainWindow::saveImage()
 {
-    auto fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+    auto fileName = QFileDialog::getSaveFileName(this, tr("Enregistrer l'image"),
                                                  QDir::homePath() + "/fractal.png",
                                                  tr("Images (*.png *.xpm *.jpg)"));
     if (fileName.isEmpty()) return;

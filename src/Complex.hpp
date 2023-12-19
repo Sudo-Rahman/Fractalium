@@ -26,14 +26,6 @@ namespace Fractalium
 
         Complex operator/(Complex const &obj) const;
 
-        Complex &operator+=(Complex const &obj);
-
-        Complex &operator-=(Complex const &obj);
-
-        Complex &operator*=(Complex const &obj);
-
-        Complex &operator/=(Complex const &obj);
-
         [[nodiscard]] Double norm() const;
     };
 }

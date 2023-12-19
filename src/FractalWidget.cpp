@@ -18,7 +18,7 @@ FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent)
 }
 
 /**
- * @brief Destructeur de la classe FractalWidget
+ * @brief Evènement de pression de la souris, permet de définir la zone de sélection de la fractale à afficher
  * @param event
  */
 void FractalWidget::mousePressEvent(QMouseEvent *event)
@@ -30,7 +30,7 @@ void FractalWidget::mousePressEvent(QMouseEvent *event)
 }
 
 /**
- * @brief Permet de définir la zone de sélection de la fractale à afficher
+ * @brief Permet de définir la zone de sélection pour zoomer dans la fractale
  * @param event L'évènement de relâchement de la souris
  */
 void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -49,6 +49,7 @@ void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
 
     _release_point = event->pos();
 
+//    si le point de relâchement est plus petit que le point de départ, on inverse les deux points
     if (_release_point.x() < _start_point.x())
         std::swap(_release_point, _start_point);
 
@@ -57,7 +58,7 @@ void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
 }
 
 /**
- * @brief Permet de définir la zone de sélection de la fractale à afficher
+ * @brief Dessine le rectangle de sélection sur la fractale
  * @param event L'évènement de déplacement de la souris
  */
 void FractalWidget::mouseMoveEvent(QMouseEvent *event)
@@ -69,8 +70,8 @@ void FractalWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 /**
- * @brief Permet de définir la zone de sélection de la fractale à afficher
- * @param event L'évènement de déplacement de la souris
+ * @brief Permet de définir l'image de la fractale à afficher
+ * @param pixmap L'image de la fractale à afficher
  */
 void FractalWidget::setPixmap(const QPixmap &pixmap)
 {
@@ -78,7 +79,7 @@ void FractalWidget::setPixmap(const QPixmap &pixmap)
 }
 
 /**
- * @brief Permet de définir la zone de sélection de la fractale à afficher
+ * @brief Permet de définir l'image de la fractale à afficher
  * @param image L'image de la fractale à afficher
  */
 void FractalWidget::setFractal(const QImage &image)

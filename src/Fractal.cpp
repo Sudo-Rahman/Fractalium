@@ -3,7 +3,6 @@
 //
 
 #include "Fractal.hpp"
-#include <boost/thread.hpp>
 
 using namespace Fractalium;
 
@@ -47,8 +46,7 @@ int Fractal::Julia::pointCheck(const Complex &point, int iterations)
     int i;
     for (i = 0; i < iterations; ++i)
     {
-        boost::this_thread::interruption_point();
-        z *= z += Fractal::Julia::juliaConstant;
+        z = z * z + Fractal::Julia::juliaConstant;
         if (z.norm() > 2.0)
             break;
     }
@@ -67,8 +65,7 @@ int Fractal::Mandelbrot::pointCheck(const Complex &point, int iterations)
     Complex z = Complex(0, 0);
     for (i = 0; i < iterations; ++i)
     {
-        boost::this_thread::interruption_point();
-        z *= z += point;
+        z = z * z + point;
         if (z.norm() > 2.0)
             break;
     }
@@ -88,7 +85,6 @@ int Fractal::BurningShip::pointCheck(const Complex &point, int iterations)
     Complex z = Complex(0, 0);
     for (i = 0; i < iterations; ++i)
     {
-        boost::this_thread::interruption_point();
         z.real = abs(z.real);
         z.imag = abs(z.imag);
         z = z * z + point;

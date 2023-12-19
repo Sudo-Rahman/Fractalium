@@ -14,7 +14,7 @@ Complex::Complex(Double r, Double i)
 }
 
 /**
- * @brief  Constructeur par copie
+ * @brief  Constructeur par defaut sans paramètres
  */
 Complex::Complex()
 {
@@ -86,48 +86,4 @@ Complex Complex::operator/(Complex const &obj) const
 {
     return {(real * obj.real + imag * obj.imag) / (obj.real * obj.real + obj.imag * obj.imag),
             (imag * obj.real - real * obj.imag) / (obj.real * obj.real + obj.imag * obj.imag)};
-}
-
-/**
- * @brief  Surcharge de l'opérateur de comparaison
- * @param obj  Nombre complexe à comparer
- * @return  bool
- */
-Complex &Complex::operator+=(const Complex &obj)
-{
-    *this = this->operator+(obj);
-    return *this;
-}
-
-/**
- * @brief  Surcharge de l'opérateur de comparaison
- * @param obj  Nombre complexe à comparer
- * @return  bool
- */
-Complex &Complex::operator-=(const Complex &obj)
-{
-    *this = this->operator-(obj);
-    return *this;
-}
-
-/**
- * @brief  Surcharge de l'opérateur de comparaison
- * @param obj  Nombre complexe à comparer
- * @return  bool
- */
-Complex &Complex::operator*=(const Complex &obj)
-{
-    *this = this->operator*(obj);
-    return *this;
-}
-
-/**
- * @brief  Surcharge de l'opérateur de comparaison
- * @param obj  Nombre complexe à comparer
- * @return  bool
- */
-Complex &Complex::operator/=(const Complex &obj)
-{
-    *this = this->operator/(obj);
-    return *this;
 }

@@ -2,24 +2,17 @@
 #define MANDELBROT_MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QPainter>
 #include <QColor>
 #include <QMouseEvent>
-#include <QPoint>
 #include <QProgressBar>
 #include <QImage>
 #include <QMenuBar>
 #include <QStatusBar>
-#include "FractalWidget.hpp"
-#include "Fractal.hpp"
-#include "Image.hpp"
+#include <FractalWidget.hpp>
+#include <Fractal.hpp>
+#include <Image.hpp>
+#include <History.hpp>
 
-struct history {
-    QImage image;
-    std::pair<Fractalium::Double, Fractalium::Double> offset;
-    Fractalium::Double step_coord;
-
-};
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -45,7 +38,7 @@ Q_OBJECT
 
     Fractalium::Image _divergence_image;
 
-    std::vector<history> _back_history, _front_history;
+    std::vector<Fractalium::History> _back_history, _front_history;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

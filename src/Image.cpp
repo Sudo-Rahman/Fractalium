@@ -67,7 +67,7 @@ Fractalium::Image::Image(Fractalium::Image &&other) noexcept
 #include <boost/mpi.hpp>
 
 /**
- * @brief Merge two images
+ * @brief Combine l'image courante avec une autre image
  * @param image
  */
 void Fractalium::Image::merge(Fractalium::Image &image)

@@ -6,7 +6,6 @@
 #define FRACTALIUM_FRACTAL_HPP
 
 #include <Complex.hpp>
-#include <iostream>
 #include <boost/serialization/serialization.hpp>
 
 

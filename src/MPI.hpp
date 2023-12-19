@@ -9,9 +9,8 @@
 #include <vector>
 #include <Double.hpp>
 #include <Fractal.hpp>
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
 #include <Image.hpp>
+#include <future>
 #include <boost/signals2.hpp>
 
 

@@ -38,7 +38,6 @@ void Fractalium::MPICalculator::calculate(const MPIStruct &data, Image &image)
     {
         for (uint16_t y = data.start_y; y < data.end_y; ++y)
         {
-            boost::this_thread::interruption_point();
             Fractalium::Complex point = Fractalium::Complex(
                     mpi_struct.offset_x + x * mpi_struct.step_coord,
                     mpi_struct.offset_y + y * mpi_struct.step_coord
@@ -58,7 +57,7 @@ void Fractalium::MPICalculator::receive(Image &image)
     mpi::communicator world;
     if (rank == 0)
     {
-        auto counter = new std::atomic<uint16_t>(0);
+        auto counter = new std::atomic<uint32_t>(0);
         for (int proc = 1; proc < world.size(); ++proc)
         {
             auto image_tmp = Image();
@@ -78,7 +77,7 @@ void Fractalium::MPICalculator::receive(Image &image)
 }
 
 /**
- * @brief master envoie des processus à traiter aux noeuds enfants
+ * @brief master envoie des taches à traiter aux noeuds enfants
  * @param data Données à envoyer
  * @param image Image fractale
  */
@@ -104,7 +103,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
 }
 
 /**
- * @brief Fermer le programme et arreter tous les noeuds
+ * @brief Ferme le programme et arrete tous les noeuds
  */
 void Fractalium::MPICalculator::stop()
 {

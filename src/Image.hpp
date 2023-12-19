@@ -8,8 +8,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
-#include <ostream>
-#include <mutex>
 
 namespace Fractalium
 {
