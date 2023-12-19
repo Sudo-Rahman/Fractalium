@@ -251,7 +251,7 @@ void MainWindow::setupUi()
     connect(action, &QAction::triggered, this, [this]()
     {
         _offset = {-2.1, -2};
-        _step_coord = 3.5 / _label->width();
+        _step_coord = max(3.5 / _label->width(), 3.5 / _label->height());
         *_fractal = Fractalium::Fractal();
         mpiCalculate();
     });
@@ -261,7 +261,7 @@ void MainWindow::setupUi()
     connect(action, &QAction::triggered, this, [this]()
     {
         _offset = {-2.1, -2};
-        _step_coord = 3.5 / _label->width();
+        _step_coord = max(3.5 / _label->width(), 3.5 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Julia);
         mpiCalculate();
     });
@@ -271,7 +271,7 @@ void MainWindow::setupUi()
     connect(action, &QAction::triggered, this, [this]()
     {
         _offset = {-2.2, -2};
-        _step_coord = 3.2 / _label->width();
+        _step_coord = max(3.2 / _label->width(), 3.2 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::BurningShip);
         mpiCalculate();
     });
@@ -281,7 +281,7 @@ void MainWindow::setupUi()
     connect(action, &QAction::triggered, this, [this]()
     {
         _offset = {-3, -3};
-        _step_coord = 6.0 / _label->width();
+        _step_coord = max(6.0 / _label->width(), 6.0 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Newton);
         mpiCalculate();
     });
@@ -292,7 +292,7 @@ void MainWindow::setupUi()
     connect(action, &QAction::triggered, this, [this]()
     {
         _offset = {-5, -5};
-        _step_coord = 10.0 / _label->width();
+        _step_coord = max(10.0 / _label->width(), 10.0 / _label->height());
         *_fractal = Fractalium::Fractal(Fractalium::Fractal::FractalType::Koch);
         mpiCalculate();
     });
@@ -383,7 +383,8 @@ void MainWindow::setupUi()
             auto size = dialog.returnSize();
             this->setFixedSize(size);
             this->_label->setFixedSize(size);
-            *_image = QImage(size, QImage::Format_RGB32);
+            delete _image;
+            _image = new QImage(size, QImage::Format_RGB32);
             _divergence_image = Fractalium::Image(size.width(), size.height());
         }
     });
@@ -432,7 +433,7 @@ void MainWindow::mpiCalculate()
             _offset.first,
             _offset.second,
             _label->width(), _label->height(),
-            Fractalium::Fractal::ITERATIONS,
+             static_cast<int>(Fractalium::Fractal::ITERATIONS),
             _step_coord,
             *_fractal
     );

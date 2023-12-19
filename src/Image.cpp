@@ -14,14 +14,7 @@ Fractalium::Image::Image(uint32_t size_x, uint32_t size_y)
 {
     _width = size_x;
     _height = size_y;
-    _image.resize(size_y);
-    for (auto &i: _image)
-        i.resize(size_x);
-
-//    init all pixels to -1
-    for (auto &i: _image)
-        for (auto &j: i)
-            j = -1;
+    _image.resize(size_x, std::vector<int>(size_y, -1));
 }
 
 /**

@@ -21,7 +21,7 @@ ResizeDialog::ResizeDialog(const QSize &current, QWidget *parent) : QDialog(pare
     layout->addWidget(_width, 0, 1, 1, 1);
 
 
-    layout->addWidget(new QLabel("width"), 1, 0, 1, 1);
+    layout->addWidget(new QLabel("height"), 1, 0, 1, 1);
 
     _height = new QSpinBox(this);
     _height->setRange(400, 5120);

@@ -71,7 +71,7 @@ void Fractalium::MPICalculator::receive(Image &image)
 }
 
 /**
- * @brief Envoie des données au processus 0 (master)
+ * @brief master envoie des processus à traiter aux noeuds enfants
  * @param data Données à envoyer
  * @param image Image fractale
  */
@@ -85,8 +85,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         for (int proc = 0; proc < world.size() - 1; ++proc)
         {
             mpi_tmp.start_x = x_delta / (world.size() - 1) * proc;
-            if (proc == world.size() - 1) mpi_tmp.end_x = mpi_tmp.end_x;
-            else mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
+            mpi_tmp.end_x = x_delta / (world.size() - 1) * (proc + 1);
             world.send(proc + 1, 0, mpi_tmp);
         }
         receive(image);
