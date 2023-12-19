@@ -23,6 +23,8 @@ FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent)
  */
 void FractalWidget::mousePressEvent(QMouseEvent *event)
 {
+    if (!_selection_enabled)
+        return;
     _rubber_band_selection = true;
     _start_point = event->pos();
 }

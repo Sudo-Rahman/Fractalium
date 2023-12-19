@@ -21,6 +21,8 @@ namespace Fractalium
 
         QPoint _start_point, _release_point;
 
+        bool _selection_enabled{true};
+
         void setPixmap(const QPixmap &pixmap);
 
     public:
@@ -30,6 +32,12 @@ namespace Fractalium
         = default;
 
         void setFractal(const QImage &image);
+
+        void disableSelection()
+        { _selection_enabled = false; }
+
+        void enableSelection()
+        { _selection_enabled = true; }
 
     signals:
 

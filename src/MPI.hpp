@@ -92,13 +92,20 @@ namespace Fractalium
 
     class MPICalculator {
 
+        static std::future<void> future;
+
     public:
-        static boost::signals2::signal<void()> signal;
+        static boost::signals2::signal<void()> finshed;
+
+        static boost::signals2::signal<void(uint32_t )> node_recived;
 
         static MPIStruct mpi_struct;
 
         static uint16_t rank;
 
+        static bool is_running;
+
+        static uint32_t node_count;
 
         explicit MPICalculator(uint16_t rank);
 
