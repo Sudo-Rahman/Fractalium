@@ -120,15 +120,23 @@ void MainWindow::updateColor() {
     }
 }
 
-
-color getColorForDivergence(const int &divergence, const int &maxDivergence, const int &red, const int &green,
-                            const int &blue) {
+/**
+ * @brief Retourne la couleur en fonction de la divergence et de la couleur max du fractal (couleur dynamique)
+ * @param divergence
+ * @param maxDivergence
+ * @param red
+ * @param green
+ * @param blue
+ * @return
+ */
+color getColorForDivergence(int divergence, int maxDivergence, int red, int green, int blue) {
     if (divergence == maxDivergence) {
         return {0, 0, 0};
     } else {
-        const int r = static_cast<int>(std::min((divergence + 1) * std::round(red / 3.0), 255.0));
-        const int g = static_cast<int>(std::min((divergence + 1) * std::round(green / 3.0), 255.0));
-        const int b = static_cast<int>(std::min((divergence + 1) * std::round(blue / 3.0), 255.0));
+        const double factor = (divergence + 1) / 3.0;
+        const int r = std::clamp(static_cast<int>(std::lround(factor * red)), 0, 255);
+        const int g = std::clamp(static_cast<int>(std::lround(factor * green)), 0, 255);
+        const int b = std::clamp(static_cast<int>(std::lround(factor * blue)), 0, 255);
         return {r, g, b};
     }
 }
