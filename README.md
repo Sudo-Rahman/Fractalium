@@ -35,6 +35,7 @@ architecture distribuée.
 - Boost MPI
 - MPI
 - Git
+- Qt >=5
 
 ## Démarrage
 
