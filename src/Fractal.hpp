@@ -30,8 +30,6 @@ namespace Fractalium
 
         [[nodiscard]] int pointCheck(const Complex &pointm, int iterations) const;
 
-        static uint64_t ITERATIONS;
-
         void setType(FractalType type)
         {
             _type = type;

@@ -27,9 +27,6 @@ Q_OBJECT
 
     std::vector<QColor> _color_map;
 
-    uint16_t DISPLAY_SIZE_WIDTH = 500;
-    uint16_t DISPLAY_SIZE_HEIGHT = 500;
-
     std::pair<Fractalium::Double, Fractalium::Double> _offset = {-2.1, -2};
 
     Fractalium::Double _step_coord;
@@ -40,6 +37,8 @@ Q_OBJECT
 
     std::vector<Fractalium::History> _back_history, _front_history;
 
+    QString _lauched_time;
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
@@ -47,7 +46,7 @@ public:
 
     static const int TOTAL_COLORS = 500;
 
-    static MainWindow* instance;
+    static MainWindow *instance;
 
 private:
     void paintFractal();
@@ -66,8 +65,13 @@ private:
 
     void updateColor();
 
-    static void signalSnapshot(int signum, std::vector<Fractalium::History> &backHistory,
-                           std::vector<Fractalium::History> &frontHistory, Fractalium::Fractal &fractal);
+    void loadSnapshot(const Fractalium::SnapshotHistory &snapshot);
+
+    void lauchAfterCrash();
+
+
+    static void signalSnapshot(int signum, const std::vector<Fractalium::History> &backHistory,
+                               const std::vector<Fractalium::History> &frontHistory,const Fractalium::Fractal &fractal);
 
     static void handleSignal();
 
@@ -79,7 +83,8 @@ class PaintFractalEvent : public QEvent {
 public:
     static const QEvent::Type PaintFractalEventType = static_cast<QEvent::Type>(QEvent::User + 1);
 
-    explicit PaintFractalEvent() : QEvent(PaintFractalEventType) {}
+    explicit PaintFractalEvent() : QEvent(PaintFractalEventType)
+    {}
 
     ~PaintFractalEvent() override = default;
 };

@@ -48,7 +48,7 @@ git clone https://github.com/Sudo-Rahman/Fractalium.git
 2. **Compilation :**
 
 ```bash
-make
+mkdir build
 ```
 
 ```bash
@@ -68,13 +68,13 @@ make
 Pour éxecuter en local :
 
 ```bash
-mpirun -np 8 ./Fractalium
+mpirun -np nombre_de_threads ./Fractalium
 ```
 
 Pour éxecuter sur un cluster :
 
 ```bash
-mpirun -hostfile hosts ./Fractalium
+mpirun -hostfile -hostfile fichier_hosts ./Fractalium
 ```
 
 

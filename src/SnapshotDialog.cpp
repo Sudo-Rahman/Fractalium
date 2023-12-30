@@ -6,7 +6,8 @@
 #include <QFileDialog>
 #include <qgridlayout.h>
 
-SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWidget *parent) : QDialog(parent) {
+SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWidget *parent) : QDialog(parent)
+{
     setWindowTitle("Instantané");
     setFixedHeight(100);
 
@@ -20,7 +21,8 @@ SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWi
     make_snapshot->setToolTip("Faire un instantané");
     layout->addWidget(make_snapshot, 0, 1, 1, 1);
 
-    connect(_import_snapshot, &QPushButton::clicked, this, [this, &snapshotHistory]() {
+    connect(_import_snapshot, &QPushButton::clicked, this, [this, &snapshotHistory]()
+    {
         QString filename = QFileDialog::getOpenFileName(this, tr("Importer un instantané"),
                                                         QDir::homePath(),
                                                         tr("(*.fractalium)"));
@@ -31,7 +33,8 @@ SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWi
         close();
     });
 
-    connect(make_snapshot, &QPushButton::clicked, this, [this, &snapshotHistory]() {
+    connect(make_snapshot, &QPushButton::clicked, this, [this, &snapshotHistory]()
+    {
         auto dateTime = QDateTime::currentDateTime();
         QString filename = QFileDialog::getSaveFileName(this, tr("Sauvegarder un instantané"),
                                                         QDir::homePath() + "/fractalium_" +

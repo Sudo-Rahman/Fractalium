@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <mainwindow.hpp>
-#include <iostream>
 #include <MPI.hpp>
 #include <boost/mpi.hpp>
 
