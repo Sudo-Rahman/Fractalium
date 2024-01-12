@@ -9,7 +9,6 @@
   <img width="250px" height="250px" src="https://github.com/Sudo-Rahman/Fractalium/blob/main/documentation/image/bs2.png" alt="Burning Ship" />
 </p>
 
-
 # Calcul Distribué de l'Ensemble de Mandelbrot avec C++ MPI
 
 ## Aperçu
@@ -36,6 +35,12 @@ architecture distribuée.
 - MPI
 - Git
 - Qt >=5
+
+## Compatibilité
+
+<img src="https://img.shields.io/badge/OS-MacOS-informational?style=flat&logo=apple&logoColor=white&color=2bbc8a" alt="MacOS" />
+<img src="https://img.shields.io/badge/OS-Linux-informational?style=flat&logo=linux&logoColor=white&color=2bbc8a" alt="Linux" />
+<img src="https://img.shields.io/badge/OS-Windows-informational?style=flat&logo=windows&logoColor=white&color=2bbc8a" alt="Windows" />
 
 ## Démarrage
 
@@ -74,7 +79,7 @@ mpirun -np nombre_de_threads ./Fractalium
 Pour éxecuter sur un cluster :
 
 ```bash
-mpirun -hostfile -hostfile fichier_hosts ./Fractalium
+mpirun -hostfile fichier_hosts ./Fractalium
 ```
 
 
