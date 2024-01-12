@@ -201,4 +201,11 @@ void SettingsDialog::initAutoSnapshotsUi()
     });
 
     _layout->addWidget(auto_snapshots);
+
+    auto github = new QLabel(this);
+    github->setText("<a href=\""+ QString::fromStdString(Settings::GITHUB_URL) +"\">Github</a>");
+    github->setTextFormat(Qt::RichText);
+    github->setOpenExternalLinks(true);
+    github->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    _layout->addWidget(github,Qt::AlignCenter);
 }

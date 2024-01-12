@@ -15,6 +15,7 @@ using namespace Fractalium;
 FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent)
 {
     _rubber_band = new QRubberBand(QRubberBand::Rectangle, this);
+    _selection_enabled = false;
 }
 
 /**

@@ -30,6 +30,8 @@ namespace Fractalium
         static void resetCrash();
 
         static void setCrash();
+
+        static const std::string GITHUB_URL;
     };
 }
 

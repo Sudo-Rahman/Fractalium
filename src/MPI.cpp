@@ -114,5 +114,5 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
  */
 void Fractalium::MPICalculator::stop()
 {
-    exit(0);
+    mpi::communicator().abort(0);
 }

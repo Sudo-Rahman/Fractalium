@@ -17,6 +17,7 @@ bool Settings::AUTO_SNAPSHOTS = false;
 std::string Settings::SAVE_PATH = "./";
 const std::string Settings::CRASH_SNAP_PATH = "./snapshot_crash.fractalium";
 bool Settings::IS_CRASHED = false;
+const std::string Settings::GITHUB_URL = "https://github.com/Sudo-Rahman/Fractalium";
 
 void Settings::saveSettings()
 {
