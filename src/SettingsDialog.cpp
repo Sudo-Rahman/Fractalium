@@ -119,7 +119,7 @@ void SettingsDialog::initIterationsUi()
         _iterations = val;
     });
 
-    connect(iteration_spin, &QSpinBox::valueChanged, this, [=, this](int val)
+    connect(iteration_spin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this](int val)
     {
         label_current->setText("value : " + QString::number(val));
         iteration->setValue(val);

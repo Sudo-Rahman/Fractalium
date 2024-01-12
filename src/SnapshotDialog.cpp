@@ -5,6 +5,7 @@
 #include "SnapshotDialog.hpp"
 #include <QFileDialog>
 #include <qgridlayout.h>
+#include <QDateTime>
 
 SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWidget *parent) : QDialog(parent)
 {

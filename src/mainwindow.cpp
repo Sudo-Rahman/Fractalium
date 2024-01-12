@@ -11,7 +11,7 @@
 #include <History.hpp>
 #include <Settings.hpp>
 #include <SettingsDialog.hpp>
-
+#include <QDateTime>
 
 using std::min;
 using std::max;
