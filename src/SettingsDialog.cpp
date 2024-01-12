@@ -18,6 +18,10 @@
 
 using Fractalium::Settings;
 
+/**
+ * @brief Constructeur de la classe SettingsDialog
+ * @param parent Widget parent
+ */
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 {
 
@@ -38,6 +42,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 
 }
 
+/**
+ * @brief Fonction d'initialisation de l'interface graphique
+
+ */
 void SettingsDialog::initUi()
 {
     initResizeUi();
@@ -60,6 +68,9 @@ void SettingsDialog::initUi()
     });
 }
 
+/**
+ * @brief Fonction d'initialisation de l'interface graphique pour le redimensionnement de la fenêtre
+ */
 void SettingsDialog::initResizeUi()
 {
 // Resize
@@ -92,7 +103,10 @@ void SettingsDialog::initResizeUi()
     _layout->addWidget(resize);
 }
 
+/**
+ * @brief Fonction d'initialisation de l'interface graphique pour le nombre d'itérations
 
+ */
 void SettingsDialog::initIterationsUi()
 {
     // Iterations
@@ -138,6 +152,10 @@ void SettingsDialog::initIterationsUi()
     _layout->addWidget(iterations);
 }
 
+/**
+ * @brief Fonction d'initialisation de l'interface graphique pour les instantanés automatiques
+
+ */
 void SettingsDialog::initAutoSnapshotsUi()
 {
     // AutoSnapshots

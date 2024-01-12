@@ -7,6 +7,11 @@
 #include <qgridlayout.h>
 #include <QDateTime>
 
+/**
+ * @brief Constructeur de SnapshotDialog qui permet de faire un instantané ou d'en importer un
+ * @param snapshotHistory
+ * @param parent
+ */
 SnapshotDialog::SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("Instantané");

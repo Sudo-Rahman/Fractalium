@@ -29,6 +29,10 @@ void Settings::saveSettings()
     settings.setValue("is_crashed", IS_CRASHED);
 }
 
+
+/**
+ * @brief Fonction qui initialise les paramètres de l'application à partir des paramètres sauvegardés dans le fichier de configuration de l'application
+ */
 void Settings::init()
 {
     QCoreApplication::setOrganizationName("Fractalium Inc.");
@@ -43,6 +47,10 @@ void Settings::init()
     IS_CRASHED = settings.value("is_crashed", IS_CRASHED).toBool();
 }
 
+
+/**
+ * @brief Fonction qui permet de réinitialiser les paramètres de l'application
+ */
 void Settings::resetCrash()
 {
     IS_CRASHED = false;
@@ -50,6 +58,9 @@ void Settings::resetCrash()
     settings.setValue("is_crashed", false);
 }
 
+/**
+ * @brief Fonction qui permet de définir que l'application a crashé
+ */
 void Settings::setCrash()
 {
     IS_CRASHED = true;
