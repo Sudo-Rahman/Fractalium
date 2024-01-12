@@ -79,11 +79,14 @@ mpirun -np nombre_de_threads ./Fractalium
 Pour éxecuter sur un cluster :
 
 ```bash
-mpirun -hostfile fichier_hosts ./Fractalium
+mpirun -hostfile <fichier_hosts> ./Fractalium
 ```
 
+## Auteurs
 
+Ce projet a été réalisé par:
 
-
+- [Sudo-Rahman](https://github.com/Sudo-Rahman) 
+- [Maxime-Cllt](https://github.com/Maxime-Cllt)
 
 
