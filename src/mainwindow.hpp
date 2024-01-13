@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QColor>
+#include <QTimer>
 #include <QMouseEvent>
 #include <QProgressBar>
 #include <QImage>
@@ -36,6 +37,10 @@ Q_OBJECT
     Fractalium::Image _divergence_image;
 
     std::vector<Fractalium::History> _back_history, _front_history;
+
+    QTimer *_timer;
+    uint64_t _counter = 0;
+    QLabel *_status_label;
 
     QString _lauched_time;
 

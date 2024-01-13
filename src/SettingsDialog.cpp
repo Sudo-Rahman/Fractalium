@@ -12,9 +12,9 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSpinBox>
-#include <Settings.hpp>
 #include <QSlider>
 #include <QFileDialog>
+#include <QComboBox>
 
 using Fractalium::Settings;
 
@@ -51,6 +51,14 @@ void SettingsDialog::initUi()
     initResizeUi();
     initIterationsUi();
     initAutoSnapshotsUi();
+    initCalculationTypeUi();
+
+    auto github = new QLabel(this);
+    github->setText("<a href=\"" + QString::fromStdString(Settings::GITHUB_URL) + "\">Github</a>");
+    github->setTextFormat(Qt::RichText);
+    github->setOpenExternalLinks(true);
+    github->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    _layout->addWidget(github, Qt::AlignCenter);
 
     auto save = new QPushButton("Enregistrer", this);
     save->setDefault(true);
@@ -63,9 +71,11 @@ void SettingsDialog::initUi()
         Settings::ITERATIONS = _iterations;
         Settings::AUTO_SNAPSHOTS = _auto_snapshots;
         Settings::SAVE_PATH = _save_path.toStdString();
+        Settings::CALCULATION_TYPE = _calculation_type;
         Settings::saveSettings();
         close();
     });
+
 }
 
 /**
@@ -201,11 +211,58 @@ void SettingsDialog::initAutoSnapshotsUi()
     });
 
     _layout->addWidget(auto_snapshots);
+}
 
-    auto github = new QLabel(this);
-    github->setText("<a href=\""+ QString::fromStdString(Settings::GITHUB_URL) +"\">Github</a>");
-    github->setTextFormat(Qt::RichText);
-    github->setOpenExternalLinks(true);
-    github->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    _layout->addWidget(github,Qt::AlignCenter);
+void SettingsDialog::initCalculationTypeUi()
+{
+    auto calculation_type = new QGroupBox("Type de calcul", this);
+
+    auto calculation_type_layout = new QVBoxLayout(calculation_type);
+
+    auto calculation_type_combo_box = new QComboBox(this);
+    calculation_type_combo_box->addItems({"Colonnes", "Carrés"});
+    calculation_type_layout->addWidget(calculation_type_combo_box);
+    _calculation_type = Settings::CALCULATION_TYPE;
+    calculation_type_combo_box->setCurrentIndex(static_cast<uint8_t >(_calculation_type));
+
+    auto description = new QLabel(this);
+
+    auto description_text = [this, description]
+    {
+        switch (_calculation_type)
+        {
+            case Settings::COLLUMNS:
+            {
+                if (Settings::DISPLAY_SIZE_WIDTH < Settings::NODES)
+                    description->setText(
+                            "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale. Attention, le nombre de colonnes est supérieur au nombre de noeuds, il est donc possible que certains noeuds ne calculent aucune colonne de pixels.");
+                else
+                    description->setText(
+                            "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale");
+            }
+                break;
+            case Settings::SQUARES:
+            {
+                if(Settings::NODES < 50)
+                    description->setText(
+                            "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale. Attention, le nombre de noeuds est faible pour ce mode de calcul, il est donc possible que certaines zones de l'image ne soient pas calculées.");
+                else
+                    description->setText(
+                            "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale");
+            }
+                break;
+        }
+    };
+    description_text();
+
+    connect(calculation_type_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [description_text, this](int index)
+            {
+                _calculation_type = static_cast<Settings::CalculationType>(index);
+                description_text();
+
+            });
+
+    calculation_type_layout->addWidget(description);
+    _layout->addWidget(calculation_type);
 }

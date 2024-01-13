@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace Fractalium
 {
@@ -17,11 +18,20 @@ namespace Fractalium
 
         static uint32_t ITERATIONS;
 
+        static uint32_t NODES;
+
         static bool AUTO_SNAPSHOTS;
         static std::string SAVE_PATH;
 
         static bool IS_CRASHED;
         const static std::string CRASH_SNAP_PATH ;
+
+        enum CalculationType : uint8_t {
+            COLLUMNS,
+            SQUARES,
+        };
+
+        static CalculationType CALCULATION_TYPE;
 
         static void saveSettings();
 

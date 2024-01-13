@@ -92,15 +92,34 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setCentralWidget(central);
 
     _status_bar = new QStatusBar(this);
+    _status_bar->setContentsMargins(10, 0, 10, 0);
     this->setStatusBar(_status_bar);
+    _status_label = new QLabel(this);
+    _status_bar->addWidget(_status_label, 0);
+    _timer = new QTimer(this);
+    _timer->setInterval(10);
+    auto time_label = new QLabel(this);
+    _status_bar->addPermanentWidget(time_label, 0);
+    connect(_timer, &QTimer::timeout, this, [time_label, this]()
+    {
+        _counter += 10;
+        time_label->setText("Temps écoulé : " + QString::number(_counter / 1000.0) +
+                            " secondes");
+    });
 
-    if(Fractalium::MPICalculator::node_count <2)
+    if (Fractalium::MPICalculator::node_count < 2)
     {
         _status_bar->showMessage("2 noeuds MPI minimum requis");
         return;
     }
 
     Settings::init();
+    Settings::NODES = Fractalium::MPICalculator::node_count;
+
+    if (Fractalium::MPICalculator::node_count > Settings::DISPLAY_SIZE_WIDTH)
+    {
+        Settings::CALCULATION_TYPE = Settings::CalculationType::SQUARES;
+    }
 
     _lauched_time = QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss");
 
@@ -113,13 +132,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     _label->setFixedSize(Settings::DISPLAY_SIZE_WIDTH, Settings::DISPLAY_SIZE_HEIGHT);
 
 
-    this->setFixedSize(Settings::DISPLAY_SIZE_WIDTH, Settings::DISPLAY_SIZE_HEIGHT);
+    this->setFixedSize(Settings::DISPLAY_SIZE_WIDTH, Settings::DISPLAY_SIZE_HEIGHT+_status_bar->height());
 
     Fractalium::MPICalculator::node_recived.connect(
             [this](const uint32_t &counter)
             {
-                _status_bar->showMessage("Reception des données du noeud " + QString::number(counter) + "/" +
-                                         QString::number(Fractalium::MPICalculator::node_count - 1));
+                _status_label->setText("Reception des données du noeud " + QString::number(counter) + "/" +
+                                       QString::number(Fractalium::MPICalculator::node_count - 1));
             });
 
 
@@ -144,8 +163,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             [this]
             {
                 qApp->postEvent(this, new PaintFractalEvent);
-                _status_bar->showMessage("Calcul terminé");
+                _status_label->setText("Calcul terminé");
                 _label->enableSelection();
+                _counter = 0;
             });
 
     // on regarde si le programme a crashé ou non
@@ -280,7 +300,8 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
     );
 
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
-    _status_bar->showMessage("Calcul en cours");
+    _status_label->setText("Calcul en cours");
+    _timer->start();
     _label->disableSelection();
 }
 
@@ -465,6 +486,7 @@ bool MainWindow::event(QEvent *event)
 {
     if (event->type() == PaintFractalEvent::PaintFractalEventType)
     {
+        _timer->stop();
         paintFractal();
         // si l'option est activée, on crée un snapshot
         if (Settings::AUTO_SNAPSHOTS)
@@ -477,7 +499,7 @@ bool MainWindow::event(QEvent *event)
                             *_fractal
                     };
             Fractalium::makeSnapshot(Settings::SAVE_PATH + "/" + snap_name, snapshotHistory);
-            _status_bar->showMessage("Calcul terminé et instantané sauvegardé");
+            _status_label->setText("Calcul terminé et instantané sauvegardé");
         }
         return true;
     }
@@ -504,6 +526,9 @@ void MainWindow::mpiCalculate()
             *_fractal
     );
     Fractalium::MPICalculator::send(Fractalium::MPICalculator::mpi_struct, _divergence_image);
+    _status_label->setText("Calcul en cours");
+    _timer->start();
+    _label->disableSelection();
 }
 
 /**
@@ -559,7 +584,8 @@ void MainWindow::saveImage()
  * @param fractal 
  */
 void MainWindow::signalSnapshot(int signum, const std::vector<Fractalium::History> &backHistory,
-                                const std::vector<Fractalium::History> &frontHistory, const Fractalium::Fractal &fractal)
+                                const std::vector<Fractalium::History> &frontHistory,
+                                const Fractalium::Fractal &fractal)
 {
     Fractalium::SnapshotHistory snapshotHistory{backHistory, frontHistory, fractal};
     Fractalium::makeSnapshot(Settings::CRASH_SNAP_PATH, snapshotHistory);
@@ -579,7 +605,7 @@ void MainWindow::signalSnapshot(int signum, const std::vector<Fractalium::Histor
  */
 void MainWindow::handleSignal()
 {
-    if(instance == nullptr) return;
+    if (instance == nullptr) return;
 
     std::signal(SIGSEGV, [](int signum)
     {
@@ -631,7 +657,7 @@ void MainWindow::loadSnapshot(const Fractalium::SnapshotHistory &snapshot)
 }
 
 /**
- * @brief Avertit que le programme a crashé et propose de charger la sauvegarde de l'image
+ * @brief Avertit que le programme a crashé et propose de charger la sauvegarde de l'instantané
  */
 void MainWindow::lauchAfterCrash()
 {
@@ -646,6 +672,7 @@ void MainWindow::lauchAfterCrash()
             auto snap = Fractalium::SnapshotHistory{};
             Fractalium::importSnapshot(Settings::CRASH_SNAP_PATH, snap);
             loadSnapshot(snap);
+            _label->enableSelection();
         }
         Settings::resetCrash();
     }

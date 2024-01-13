@@ -27,7 +27,7 @@ void Fractalium::Image::setPixel(uint16_t x, uint16_t y, int value)
 {
     if (x >= width() || y >= height())
     {
-        std::cout << "x: " << x << " y: " << y << std::endl;
+        std::cerr << "x: " << x << " y: " << y <<  std::endl;
         throw std::out_of_range("Pixel out of range");
     }
     _image[x][y] = value;

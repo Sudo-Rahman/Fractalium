@@ -3,6 +3,7 @@
 //
 #include "MPI.hpp"
 #include <boost/mpi.hpp>
+#include <Settings.hpp>
 
 namespace mpi = boost::mpi;
 namespace fr = Fractalium;
@@ -34,16 +35,35 @@ Fractalium::MPICalculator::MPICalculator(uint16_t rank)
  */
 void Fractalium::MPICalculator::calculate(const MPIStruct &data, Image &image)
 {
-
-    for (uint16_t x = data.start_x; x < data.end_x; ++x)
+    auto mpi_data = data;
+    if (data.end_x < data.start_x)
     {
-        for (uint16_t y = data.start_y; y < data.end_y; ++y)
+        for (uint16_t x = data.start_x; x < data.width; ++x)
+        {
+            for (uint16_t y = data.start_y; y < data.end_y; ++y)
+            {
+                Fractalium::Complex point = Fractalium::Complex(
+                        mpi_data.offset_x + x * mpi_data.step_coord,
+                        mpi_data.offset_y + y * mpi_data.step_coord
+                );
+                int q = mpi_data.fractal.pointCheck(point, mpi_data.iterations);
+                image.setPixel(x, y, q);
+            }
+        }
+        mpi_data.start_x = 0;
+        auto delta_y = data.end_y - data.start_y;
+        mpi_data.start_y = data.end_y;
+        mpi_data.end_y = (data.end_y + delta_y) > data.height ? data.height : data.end_y + delta_y;
+    }
+    for (uint16_t x = mpi_data.start_x; x < mpi_data.end_x; ++x)
+    {
+        for (uint16_t y = mpi_data.start_y; y < mpi_data.end_y; ++y)
         {
             Fractalium::Complex point = Fractalium::Complex(
-                    mpi_struct.offset_x + x * mpi_struct.step_coord,
-                    mpi_struct.offset_y + y * mpi_struct.step_coord
+                    mpi_data.offset_x + x * mpi_data.step_coord,
+                    mpi_data.offset_y + y * mpi_data.step_coord
             );
-            int q = mpi_struct.fractal.pointCheck(point, mpi_struct.iterations);
+            int q = mpi_data.fractal.pointCheck(point, mpi_data.iterations);
             image.setPixel(x, y, q);
         }
     }
@@ -89,20 +109,53 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
     {
         auto node = world.size() - 1;
         MPIStruct mpi_tmp = data;
+        auto img_pixels = data.width * data.height;
+        auto nb_pixel_per_node = img_pixels / (node - 1);
+        auto square = [&nb_pixel_per_node]
+        { return sqrt(nb_pixel_per_node); };
         auto x_delta = data.end_x - data.start_x;
-        while(x_delta / node < 1)
-        {
-            node--;
-        }
-        node_working = node;
-        for (int proc = 0; proc < node; ++proc)
+
+        auto collumns = [&](int proc)
         {
             mpi_tmp.start_x = x_delta / node * proc;
             mpi_tmp.end_x = x_delta / node * (proc + 1);
+
             world.send(proc + 1, 0, mpi_tmp);
             is_running = true;
+        };
+
+        auto squares = [&](int proc)
+        {
+            mpi_tmp.start_x = uint16_t(proc * square()) % data.end_x;
+            mpi_tmp.end_x = uint16_t((proc + 1) * square()) % data.end_x;
+
+            mpi_tmp.start_y = uint16_t((proc * square()) / data.end_x) * square();
+            mpi_tmp.end_y =  uint16_t(((proc * square()) / data.end_x) + 1) * square();
+            if (mpi_tmp.end_y > data.height) mpi_tmp.end_y = data.height;
+
+            world.send(proc + 1, 0, mpi_tmp);
+            is_running = true;
+        };
+
+
+        node_working = node;
+
+        switch (Settings::CALCULATION_TYPE)
+        {
+            default:{}
+            case Settings::COLLUMNS :
+            {
+                for (int proc = 0; proc < node; ++proc) collumns(proc);
+            }
+                break;
+            case Settings::SQUARES :
+            {
+                for (int proc = 0; proc < node; ++proc) squares(proc);
+            }
+                break;
         }
-        future = std::async(std::launch::async, [&]()
+
+        future = std::async(std::launch::async, [&]
         {
             receive(image);
         });

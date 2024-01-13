@@ -12,12 +12,14 @@ uint16_t Settings::DISPLAY_SIZE_WIDTH = 500;
 uint16_t Settings::DISPLAY_SIZE_HEIGHT = 500;
 
 uint32_t Settings::ITERATIONS = 100;
+uint32_t Settings::NODES = 0;
 
 bool Settings::AUTO_SNAPSHOTS = false;
 std::string Settings::SAVE_PATH = "./";
 const std::string Settings::CRASH_SNAP_PATH = "./snapshot_crash.fractalium";
 bool Settings::IS_CRASHED = false;
 const std::string Settings::GITHUB_URL = "https://github.com/Sudo-Rahman/Fractalium";
+Settings::CalculationType Settings::CALCULATION_TYPE = Settings::CalculationType::COLLUMNS;
 
 void Settings::saveSettings()
 {
@@ -28,6 +30,7 @@ void Settings::saveSettings()
     settings.setValue("auto_snapshots", AUTO_SNAPSHOTS);
     settings.setValue("save_path", QString::fromStdString(SAVE_PATH));
     settings.setValue("is_crashed", IS_CRASHED);
+    settings.setValue("calculation_type", CALCULATION_TYPE);
 }
 
 
@@ -46,6 +49,8 @@ void Settings::init()
     AUTO_SNAPSHOTS = settings.value("auto_snapshots", AUTO_SNAPSHOTS).toBool();
     SAVE_PATH = settings.value("save_path", QString::fromStdString(SAVE_PATH)).toString().toStdString();
     IS_CRASHED = settings.value("is_crashed", IS_CRASHED).toBool();
+    CALCULATION_TYPE = static_cast<CalculationType>(settings.value("calculation_type", CALCULATION_TYPE).toInt());
+
 }
 
 

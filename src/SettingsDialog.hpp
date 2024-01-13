@@ -8,6 +8,8 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
+#include <Settings.hpp>
+
 
 class SettingsDialog : public QDialog {
 Q_OBJECT
@@ -22,6 +24,8 @@ private:
     int _iterations;
     bool _auto_snapshots;
     QString _save_path;
+    Fractalium::Settings::CalculationType _calculation_type;
+
 
     QVBoxLayout *_layout;
 
@@ -32,6 +36,8 @@ private:
     void initIterationsUi();
 
     void initAutoSnapshotsUi();
+
+    void initCalculationTypeUi();
 
 };
 
