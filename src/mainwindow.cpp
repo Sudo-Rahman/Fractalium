@@ -96,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->setStatusBar(_status_bar);
     _status_label = new QLabel(this);
     _status_bar->addWidget(_status_label, 0);
+    _status_bar->addWidget(new QLabel(" | ", this), 0);
+    auto nb_zoom_label = new QLabel(this);
+    _status_bar->addWidget(nb_zoom_label, 0);
     _timer = new QTimer(this);
     _timer->setInterval(10);
     auto time_label = new QLabel(this);
@@ -160,11 +163,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     _fractal = new Fractalium::Fractal();
     connect(_label, &Fractalium::FractalWidget::newSelection, this, &MainWindow::newSelection);
     Fractalium::MPICalculator::finshed.connect(
-            [this]
+            [nb_zoom_label,this]
             {
                 qApp->postEvent(this, new PaintFractalEvent);
                 _status_label->setText("Calcul terminé");
                 _label->enableSelection();
+                nb_zoom_label->setText("Zoom : " + QString::number(_back_history.size()));
                 _counter = 0;
             });
 
