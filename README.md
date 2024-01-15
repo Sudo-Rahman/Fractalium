@@ -83,6 +83,14 @@ Pour éxecuter sur un cluster :
 mpirun -hostfile <fichier_hosts> ./Fractalium
 ```
 
+## Démonstration
+
+https://github.com/Sudo-Rahman/Fractalium/assets/85690773/1ca63c2c-5538-4362-8027-4b41f98bddbc
+
+## Instantané
+
+Importer l'instatané sample.fractalium dans le programme et visualiser pas moins de 10 zoom sur l'ensemble de Mandelbrot.
+
 ## Auteurs
 
 Ce projet a été réalisé par:
