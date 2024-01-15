@@ -51,7 +51,7 @@ void SettingsDialog::initUi()
     initResizeUi();
     initIterationsUi();
     initAutoSnapshotsUi();
-    initCalculationTypeUi();
+    initAreaAlgorithmTypeUi();
 
     auto github = new QLabel(this);
     github->setText("<a href=\"" + QString::fromStdString(Settings::GITHUB_URL) + "\">Github</a>");
@@ -71,7 +71,7 @@ void SettingsDialog::initUi()
         Settings::ITERATIONS = _iterations;
         Settings::AUTO_SNAPSHOTS = _auto_snapshots;
         Settings::SAVE_PATH = _save_path.toStdString();
-        Settings::CALCULATION_TYPE = _calculation_type;
+        Settings::AREA_ALGORITHM_TYPE = area_algorithm_type;
         Settings::saveSettings();
         close();
     });
@@ -213,23 +213,23 @@ void SettingsDialog::initAutoSnapshotsUi()
     _layout->addWidget(auto_snapshots);
 }
 
-void SettingsDialog::initCalculationTypeUi()
+void SettingsDialog::initAreaAlgorithmTypeUi()
 {
-    auto calculation_type = new QGroupBox("Type de calcul", this);
+    auto AREA_ALGORITHM_TYPE = new QGroupBox("Algorithme de calcule de zone", this);
 
-    auto calculation_type_layout = new QVBoxLayout(calculation_type);
+    auto AREA_ALGORITHM_TYPE_layout = new QVBoxLayout(AREA_ALGORITHM_TYPE);
 
-    auto calculation_type_combo_box = new QComboBox(this);
-    calculation_type_combo_box->addItems({"Colonnes", "Carrés"});
-    calculation_type_layout->addWidget(calculation_type_combo_box);
-    _calculation_type = Settings::CALCULATION_TYPE;
-    calculation_type_combo_box->setCurrentIndex(static_cast<uint8_t >(_calculation_type));
+    auto AREA_ALGORITHM_TYPE_combo_box = new QComboBox(this);
+    AREA_ALGORITHM_TYPE_combo_box->addItems({"Colonnes", "Carrés"});
+    AREA_ALGORITHM_TYPE_layout->addWidget(AREA_ALGORITHM_TYPE_combo_box);
+    area_algorithm_type = Settings::AREA_ALGORITHM_TYPE;
+    AREA_ALGORITHM_TYPE_combo_box->setCurrentIndex(static_cast<uint8_t >(area_algorithm_type));
 
     auto description = new QLabel(this);
 
     auto description_text = [this, description]
     {
-        switch (_calculation_type)
+        switch (area_algorithm_type)
         {
             case Settings::COLLUMNS:
             {
@@ -255,14 +255,14 @@ void SettingsDialog::initCalculationTypeUi()
     };
     description_text();
 
-    connect(calculation_type_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    connect(AREA_ALGORITHM_TYPE_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [description_text, this](int index)
             {
-                _calculation_type = static_cast<Settings::CalculationType>(index);
+                area_algorithm_type = static_cast<Settings::AreaAlgorithmType>(index);
                 description_text();
 
             });
 
-    calculation_type_layout->addWidget(description);
-    _layout->addWidget(calculation_type);
+    AREA_ALGORITHM_TYPE_layout->addWidget(description);
+    _layout->addWidget(AREA_ALGORITHM_TYPE);
 }

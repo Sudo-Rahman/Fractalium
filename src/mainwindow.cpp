@@ -121,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     if (Fractalium::MPICalculator::node_count > Settings::DISPLAY_SIZE_WIDTH)
     {
-        Settings::CALCULATION_TYPE = Settings::CalculationType::SQUARES;
+        Settings::AREA_ALGORITHM_TYPE = Settings::AreaAlgorithmType::SQUARES;
     }
 
     _lauched_time = QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss");

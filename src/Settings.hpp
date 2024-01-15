@@ -26,12 +26,12 @@ namespace Fractalium
         static bool IS_CRASHED;
         const static std::string CRASH_SNAP_PATH ;
 
-        enum CalculationType : uint8_t {
+        enum  AreaAlgorithmType : uint8_t {
             COLLUMNS,
             SQUARES,
         };
 
-        static CalculationType CALCULATION_TYPE;
+        static AreaAlgorithmType AREA_ALGORITHM_TYPE;
 
         static void saveSettings();
 

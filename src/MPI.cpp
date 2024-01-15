@@ -83,13 +83,15 @@ void Fractalium::MPICalculator::receive(Image &image)
         {
             auto image_tmp = Image();
             world.recv(proc, 1, image_tmp);
-            image.merge(image_tmp);
+            image.merge(image_tmp); // fusion des images fractales calculées par les processus MPI enfants
             (*counter)++;
-            node_recived(*counter);
+            node_recived(*counter); // envoie d'un signal pour indiquer qu'un processus MPI enfant a terminé le calcul de l'image fractale
+
+            // si tous les processus MPI enfants ont terminé le calcul de l'image fractale
             if (*counter == node_working)
             {
                 is_running = false;
-                finshed();
+                finshed(); // envoie d'un signal pour indiquer que le calcul de l'image fractale est terminé
                 counter->store(0);
             }
         }
@@ -98,7 +100,7 @@ void Fractalium::MPICalculator::receive(Image &image)
 }
 
 /**
- * @brief master envoie des taches à traiter aux noeuds enfants
+ * @brief master envoie les zone de l'image à traiter aux noeuds enfants
  * @param data Données à envoyer
  * @param image Image fractale
  */
@@ -115,6 +117,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         { return sqrt(nb_pixel_per_node); };
         auto x_delta = data.end_x - data.start_x;
 
+        // algorithme de calcule de zone par collumne
         auto collumns = [&](int proc)
         {
             mpi_tmp.start_x = x_delta / node * proc;
@@ -124,6 +127,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
             is_running = true;
         };
 
+        // algorithme de calcule de zone par carré
         auto squares = [&](int proc)
         {
             mpi_tmp.start_x = uint16_t(proc * square()) % data.end_x;
@@ -140,7 +144,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
 
         node_working = node;
 
-        switch (Settings::CALCULATION_TYPE)
+        switch (Settings::AREA_ALGORITHM_TYPE)
         {
             default:{}
             case Settings::COLLUMNS :

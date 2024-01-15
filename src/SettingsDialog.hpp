@@ -24,7 +24,7 @@ private:
     int _iterations;
     bool _auto_snapshots;
     QString _save_path;
-    Fractalium::Settings::CalculationType _calculation_type;
+    Fractalium::Settings::AreaAlgorithmType area_algorithm_type;
 
 
     QVBoxLayout *_layout;
@@ -37,7 +37,7 @@ private:
 
     void initAutoSnapshotsUi();
 
-    void initCalculationTypeUi();
+    void initAreaAlgorithmTypeUi();
 
 };
 

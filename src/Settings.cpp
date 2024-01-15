@@ -19,7 +19,7 @@ std::string Settings::SAVE_PATH = "./";
 const std::string Settings::CRASH_SNAP_PATH = "./snapshot_crash.fractalium";
 bool Settings::IS_CRASHED = false;
 const std::string Settings::GITHUB_URL = "https://github.com/Sudo-Rahman/Fractalium";
-Settings::CalculationType Settings::CALCULATION_TYPE = Settings::CalculationType::COLLUMNS;
+Settings::AreaAlgorithmType Settings::AREA_ALGORITHM_TYPE = Settings::AreaAlgorithmType::COLLUMNS;
 
 void Settings::saveSettings()
 {
@@ -30,7 +30,7 @@ void Settings::saveSettings()
     settings.setValue("auto_snapshots", AUTO_SNAPSHOTS);
     settings.setValue("save_path", QString::fromStdString(SAVE_PATH));
     settings.setValue("is_crashed", IS_CRASHED);
-    settings.setValue("calculation_type", CALCULATION_TYPE);
+    settings.setValue("AREA_ALGORITHM_TYPE", AREA_ALGORITHM_TYPE);
 }
 
 
@@ -49,7 +49,7 @@ void Settings::init()
     AUTO_SNAPSHOTS = settings.value("auto_snapshots", AUTO_SNAPSHOTS).toBool();
     SAVE_PATH = settings.value("save_path", QString::fromStdString(SAVE_PATH)).toString().toStdString();
     IS_CRASHED = settings.value("is_crashed", IS_CRASHED).toBool();
-    CALCULATION_TYPE = static_cast<CalculationType>(settings.value("calculation_type", CALCULATION_TYPE).toInt());
+    AREA_ALGORITHM_TYPE = static_cast<AreaAlgorithmType>(settings.value("AREA_ALGORITHM_TYPE", AREA_ALGORITHM_TYPE).toInt());
 
 }
 
