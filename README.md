@@ -22,7 +22,7 @@ architecture distribuée.
 
 - **Calcul Distribué :** Utilise C++ MPI pour la répartition du calcul sur plusieurs nœuds d'un cluster.
 
-- **Génération de fractal :** Calcule et visualise des fractales célèbres telles que l'ensemble de Mandelbrot,
+- **Génération de fractal :** Calcul et visualise des fractales célèbres telles que l'ensemble de Mandelbrot,
   l'ensemble de Julia et le Burning Ship.
 
 - **Paramètres Configurables :** Configurez facilement la résolution, le niveau de zoom et d'autres paramètres pour

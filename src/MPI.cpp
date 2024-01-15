@@ -117,7 +117,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
         { return sqrt(nb_pixel_per_node); };
         auto x_delta = data.end_x - data.start_x;
 
-        // algorithme de calcule de zone par collumne
+        // algorithme de calcul de zone par collumne
         auto collumns = [&](int proc)
         {
             mpi_tmp.start_x = x_delta / node * proc;
@@ -127,7 +127,7 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
             is_running = true;
         };
 
-        // algorithme de calcule de zone par carré
+        // algorithme de calcul de zone par carré
         auto squares = [&](int proc)
         {
             mpi_tmp.start_x = uint16_t(proc * square()) % data.end_x;

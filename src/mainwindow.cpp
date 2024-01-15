@@ -279,14 +279,14 @@ void MainWindow::newSelection(const QPoint &start, const QPoint &end)
 
     if (Fractalium::MPICalculator::is_running) return;
 
-    // on calcule le nouvel offset x
+    // on calcul le nouvel offset x
     _offset.first =
             _offset.first + start.x() * _step_coord;
-    // on calcule le nouvel offset y
+    // on calcul le nouvel offset y
     _offset.second =
             _offset.second + start.y() * _step_coord + (_step_coord * _label->height() / _label->width());
 
-    // on calcule le nouveau step_coord
+    // on calcul le nouveau step_coord
     int xDelta = abs(end.x() - start.x()), yDelta = abs(end.y() - start.y());
     _step_coord = Double(max(xDelta, yDelta)) / Double(_label->height() + _label->width()) *
                   _step_coord;
@@ -515,7 +515,7 @@ bool MainWindow::event(QEvent *event)
 }
 
 /**
- * @brief Calcule le fractal en utilisant MPI
+ * @brief Calcul le fractal en utilisant MPI
  */
 void MainWindow::mpiCalculate()
 {

@@ -215,7 +215,7 @@ void SettingsDialog::initAutoSnapshotsUi()
 
 void SettingsDialog::initAreaAlgorithmTypeUi()
 {
-    auto AREA_ALGORITHM_TYPE = new QGroupBox("Algorithme de calcule de zone", this);
+    auto AREA_ALGORITHM_TYPE = new QGroupBox("Algorithme de calcul de zone", this);
 
     auto AREA_ALGORITHM_TYPE_layout = new QVBoxLayout(AREA_ALGORITHM_TYPE);
 
