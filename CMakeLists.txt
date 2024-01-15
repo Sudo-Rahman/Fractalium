@@ -9,18 +9,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops")
 set(CMAKE_BUILD_TYPE Release)
 
-find_package(Qt6 COMPONENTS
-        Core
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core
         Gui
-        Widgets
-        REQUIRED)
-if (NOT Qt6_FOUND)
-    find_package(Qt5 COMPONENTS
-            Core
-            Gui
-            Widgets
-            REQUIRED)
-endif ()
+        Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core
+        Gui
+        Widgets)
 
 find_package(Boost COMPONENTS mpi REQUIRED)
 
@@ -43,8 +37,8 @@ if (NOT N EQUAL 0)
 endif ()
 
 target_link_libraries(Fractalium
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
         Boost::mpi
 )

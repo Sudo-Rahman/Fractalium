@@ -235,7 +235,7 @@ void SettingsDialog::initAreaAlgorithmTypeUi()
             {
                 if (Settings::DISPLAY_SIZE_WIDTH < Settings::NODES)
                     description->setText(
-                            "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale. Attention, le nombre de colonnes est supérieur au nombre de noeuds, il est donc possible que certains noeuds ne calculent aucune colonne de pixels.");
+                            "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale.\nAttention, le nombre de colonnes est supérieur au nombre de noeuds, il est donc possible que certains noeuds ne calculent aucune colonne de pixels.");
                 else
                     description->setText(
                             "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale");
@@ -245,7 +245,7 @@ void SettingsDialog::initAreaAlgorithmTypeUi()
             {
                 if(Settings::NODES < 50)
                     description->setText(
-                            "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale. Attention, le nombre de noeuds est faible pour ce mode de calcul, il est donc possible que certaines zones de l'image ne soient pas calculées.");
+                            "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale.\nAttention, le nombre de noeuds est faible pour ce mode de calcul, il est donc possible que certaines zones de l'image ne soient pas calculées.");
                 else
                     description->setText(
                             "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale");

@@ -149,7 +149,9 @@ void Fractalium::MPICalculator::send(const MPIStruct &data, Image &image)
             default:{}
             case Settings::COLLUMNS :
             {
-                for (int proc = 0; proc < node; ++proc) collumns(proc);
+                auto counter = node;
+                while(counter> data.width) counter--;
+                for (int proc = 0; proc < counter; ++proc) collumns(proc);
             }
                 break;
             case Settings::SQUARES :
