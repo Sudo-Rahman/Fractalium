@@ -20,19 +20,20 @@ architecture distribuée.
 
 ## Fonctionnalités
 
-- **Calcul Distribué :** Utilise C++ MPI pour la répartition du calcul sur plusieurs nœuds.
+- **Calcul Distribué :** Utilise C++ MPI pour la répartition du calcul sur plusieurs nœuds d'un cluster.
 
-- **Génération de l'Ensemble de Mandelbrot :** Calcule et visualise l'ensemble de Mandelbrot en parallèle.
+- **Génération de fractal :** Calcule et visualise des fractales célèbres telles que l'ensemble de Mandelbrot,
+  l'ensemble de Julia et le Burning Ship.
 
 - **Paramètres Configurables :** Configurez facilement la résolution, le niveau de zoom et d'autres paramètres pour
-  explorer différentes parties de l'ensemble de Mandelbrot.
+  explorer différentes parties de chaque fractale avec une grande précision et une grande vitesse de calcul grâce à la
+  distribution.
 
 ## Prérequis
 
 - C++
 - Boost
 - Boost MPI
-- MPI
 - Git
 - Qt >=5
 
@@ -86,7 +87,7 @@ mpirun -hostfile <fichier_hosts> ./Fractalium
 
 Ce projet a été réalisé par:
 
-- [Sudo-Rahman](https://github.com/Sudo-Rahman) 
+- [Sudo-Rahman](https://github.com/Sudo-Rahman)
 - [Maxime-Cllt](https://github.com/Maxime-Cllt)
 
 
