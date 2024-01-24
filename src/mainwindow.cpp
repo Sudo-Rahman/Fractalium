@@ -204,7 +204,7 @@ Color getColorForDivergence(int divergence, int maxDivergence, int red, int gree
 /**
  * @brief Peint le fractal dans l'image
  */
-void MainWindow::paintFractal() {
+void MainWindow::paintFractal(bool save) {
     const uint16_t start_x = 0, end_x = _divergence_image.width(), end_y = _divergence_image.height(), start_y = 0;
 
     if (color_mode == 0) { // Dynamique color mode (couleur en fonction de la divergence)
@@ -237,7 +237,9 @@ void MainWindow::paintFractal() {
             }
         }
     }
-    _back_history.emplace_back(Fractalium::History{*_image, _offset, _step_coord});
+    if (save) {
+        _back_history.emplace_back(Fractalium::History{*_image, _offset, _step_coord});
+    }
     _label->setFractal(*_image);
 }
 

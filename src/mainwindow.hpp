@@ -54,7 +54,7 @@ public:
     static MainWindow *instance;
 
 private:
-    void paintFractal();
+    void paintFractal(bool save);
 
     void newSelection(const QPoint &start, const QPoint &end);
 
