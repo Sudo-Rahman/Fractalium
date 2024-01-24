@@ -70,10 +70,11 @@ private:
 
     void updateColor();
 
+    void updateFractalColor();
+
     void loadSnapshot(const Fractalium::SnapshotHistory &snapshot);
 
     void lauchAfterCrash();
-
 
     static void signalSnapshot(int signum, const std::vector<Fractalium::History> &backHistory,
                                const std::vector<Fractalium::History> &frontHistory,const Fractalium::Fractal &fractal);
