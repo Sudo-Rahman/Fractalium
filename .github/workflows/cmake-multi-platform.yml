@@ -67,7 +67,19 @@ jobs:
       with:
         name: project-release
 
+    - name: Check if release already exists
+      id: check_release
+      run: |
+        if gh release view ${{ github.ref }}; then
+          echo "Release already exists."
+          echo "release-exists=true" >> $GITHUB_ENV
+        else
+          echo "Release does not exist."
+          echo "release-exists=false" >> $GITHUB_ENV
+        fi
+
     - name: Create GitHub release
+      if: env.release-exists == 'false'
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,4 +89,14 @@ jobs:
         draft: false
         prerelease: false
         body: "Automated release for version ${{ github.ref }}."
-        files: project-release.tar.gz
+
+    - name: Upload release asset
+      if: env.release-exists == 'false'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./project-release.tar.gz
+        asset_name: project-release.tar.gz
+        asset_content_type: application/gzip
