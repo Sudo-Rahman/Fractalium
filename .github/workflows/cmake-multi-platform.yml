@@ -88,7 +88,6 @@ release:
         else
           echo "Release does not exist."
           echo "release-exists=false" >> $GITHUB_ENV
-        fi
 
     - name: Create GitHub release
       if: env.release-exists == 'false'
@@ -104,7 +103,7 @@ release:
     - name: Upload release artifact
       if: env.release-exists == 'false'
       run: |
-        gh release upload ${{ env.tag_name }} project-release.tar.gz
+        gh release upload ${{ env.tag_name }} ${{ steps.strings.outputs.build-output-dir }}/project-release.tar.gz
 
     - name: Cleanup
       run: |
