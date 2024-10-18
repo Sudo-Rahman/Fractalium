@@ -1,4 +1,4 @@
-# This starter workflow is for a CMake project running on multiple platforms with Qt6, Boost, and Boost.MPI.
+# This starter workflow is for a CMake project running on multiple platforms with Qt6, Boost, and MS-MPI for Windows.
 name: CMake on multiple platforms with Qt6 and Boost
 
 on:
@@ -55,7 +55,7 @@ jobs:
       run: |
         choco install qt --version 6.5.0
         choco install boost-msvc --version 1.80.0
-        choco install openmpi
+        choco install msmpi --version 10.1.2
 
     - name: Configure CMake
       run: >
