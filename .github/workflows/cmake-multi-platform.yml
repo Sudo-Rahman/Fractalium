@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release]
-        c_compiler: [gcc, clang]
-        cpp_compiler: [g++, clang++]
+        c_compiler: [gcc]
+        cpp_compiler: [g++]
 
     steps:
     - uses: actions/checkout@v4
@@ -67,10 +67,22 @@ jobs:
       with:
         name: project-release
 
+    - name: Extract tag name
+      id: extract_tag
+      run: |
+        # Extract tag name from refs/tags/ or refs/heads/
+        ref=${{ github.ref }}
+        if [[ "$ref" == refs/tags/* ]]; then
+          tag_name=${ref#refs/tags/}
+        else
+          tag_name=${ref#refs/heads/}
+        fi
+        echo "tag_name=$tag_name" >> $GITHUB_ENV
+
     - name: Check if release already exists
       id: check_release
       run: |
-        if gh release view ${{ github.ref }}; then
+        if gh release view ${{ env.tag_name }}; then
           echo "Release already exists."
           echo "release-exists=true" >> $GITHUB_ENV
         else
@@ -84,11 +96,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: "Release ${{ github.ref }}"
+        tag_name: ${{ env.tag_name }}
+        release_name: "Release ${{ env.tag_name }}"
         draft: false
         prerelease: false
-        body: "Automated release for version ${{ github.ref }}."
+        body: "Automated release for version ${{ env.tag_name }}."
 
     - name: Upload release asset
       if: env.release-exists == 'false'
