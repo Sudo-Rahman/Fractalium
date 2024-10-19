@@ -6,9 +6,11 @@ on:
     branches: [ "test" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Allows manual trigger for creating a release
-  release:
-    types: [ created ]
+  workflow_dispatch:
+    inputs:
+      fractalium-version:
+        description: 'Version du build'
+        required: true
 
 jobs:
   build:
@@ -63,7 +65,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifact from build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: project-release
 
@@ -91,12 +93,13 @@ jobs:
           fi
 
       - name: Create GitHub release
-        if: env.release-exists == 'false'
-        run: |
-          gh release create ${{ env.tag_name }} project-release.tar.gz --title "Release ${{ env.tag_name }}" --notes "Release ${{ env.tag_name }}"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.fractalium-version }}
+          name: ${{ github.event.inputs.fractalium-version }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ github.workspace }}/project-release.tar.gz
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cleanup
-        run: |
-          rm project-release.tar.gz
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
