@@ -188,7 +188,7 @@ void MainWindow::updateColor() {
  * @param blue
  * @return
  */
-Color getColorForDivergence(int divergence, int maxDivergence, int red, int green, int blue) {
+Color getColorForDivergence(const int divergence,const int maxDivergence,const int red,const int green,const int blue) {
     if (divergence == maxDivergence) {
         return {0, 0, 0};
     } else {
@@ -537,8 +537,8 @@ void MainWindow::saveImage() {
  * @param frontHistory 
  * @param fractal 
  */
-void MainWindow::signalSnapshot(int signum, const std::vector<Fractalium::History> &backHistory,
-                                const std::vector<Fractalium::History> &frontHistory,
+void MainWindow::signalSnapshot(int signum, const std::vector <Fractalium::History> &backHistory,
+                                const std::vector <Fractalium::History> &frontHistory,
                                 const Fractalium::Fractal &fractal) {
     Fractalium::SnapshotHistory snapshotHistory{backHistory, frontHistory, fractal};
     Fractalium::makeSnapshot(Settings::CRASH_SNAP_PATH, snapshotHistory);

@@ -9,10 +9,9 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
-namespace Fractalium
-{
+namespace Fractalium {
     class Image {
-        std::vector<std::vector<int>> _image;
+        std::vector <std::vector<int>> _image;
         uint32_t _width{};
         uint32_t _height{};
 
@@ -20,7 +19,9 @@ namespace Fractalium
 
         Image() = default;
 
-        Image(Image &&other) noexcept;
+        Image(Image &&other)
+
+        noexcept;
 
         Image &operator=(const Image &other);
 
@@ -30,16 +31,13 @@ namespace Fractalium
 
         void merge(Image &image);
 
-        int getPixel(int x, int y)
-        {
+        int getPixel(int x, int y) {
             return _image[x][y];
         }
 
-        [[nodiscard]] uint16_t width() const
-        { return _width; }
+        [[nodiscard]] uint16_t width() const { return _width; }
 
-        [[nodiscard]] uint16_t height() const
-        { return _height; }
+        [[nodiscard]] uint16_t height() const { return _height; }
 
         friend std::ostream &operator<<(std::ostream &os, const Image &image);
 
@@ -47,8 +45,7 @@ namespace Fractalium
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive &ar, const unsigned int version)
-        {
+        void serialize(Archive &ar, const unsigned int version) {
             ar & _image;
             ar & _width;
             ar & _height;

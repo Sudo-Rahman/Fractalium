@@ -10,8 +10,7 @@
  * @param size_x taille de l'image
  * @param size_y largeur de l'image
  */
-Fractalium::Image::Image(uint32_t size_x, uint32_t size_y)
-{
+Fractalium::Image::Image(const uint32_t size_x, const uint32_t size_y) {
     _width = size_x;
     _height = size_y;
     _image.resize(size_x, std::vector<int>(size_y, -1));
@@ -23,11 +22,9 @@ Fractalium::Image::Image(uint32_t size_x, uint32_t size_y)
  * @param y
  * @param value
  */
-void Fractalium::Image::setPixel(uint16_t x, uint16_t y, int value)
-{
-    if (x >= width() || y >= height())
-    {
-        std::cerr << "x: " << x << " y: " << y <<  std::endl;
+void Fractalium::Image::setPixel(const uint16_t x, const uint16_t y, const int value) {
+    if (x >= width() || y >= height()) {
+        std::cerr << "x: " << x << " y: " << y << std::endl;
         throw std::out_of_range("Pixel out of range");
     }
     _image[x][y] = value;
@@ -39,12 +36,9 @@ void Fractalium::Image::setPixel(uint16_t x, uint16_t y, int value)
  * @param image
  * @return
  */
-std::ostream &Fractalium::operator<<(std::ostream &os, const Fractalium::Image &image)
-{
-    for (int i = 0; i < image.width(); ++i)
-    {
-        for (int j = 0; j < image.height(); ++j)
-        {
+std::ostream &Fractalium::operator<<(std::ostream &os, const Fractalium::Image &image) {
+    for (int i = 0; i < image.width(); ++i) {
+        for (int j = 0; j < image.height(); ++j) {
             os << image._image[i][j] << " ";
         }
         os << std::endl;
@@ -56,12 +50,13 @@ std::ostream &Fractalium::operator<<(std::ostream &os, const Fractalium::Image &
  * @brief Constructeur par copie
  * @param other
  */
-Fractalium::Image::Image(Fractalium::Image &&other) noexcept
-{
-    _image = std::move(other._image);
-    _width = other._width;
-    _height = other._height;
+Fractalium::Image::Image(Fractalium::Image &&other)
 
+noexcept
+{
+_image = std::move(other._image);
+_width = other._width;
+_height = other._height;
 }
 
 #include <boost/mpi.hpp>
@@ -70,18 +65,14 @@ Fractalium::Image::Image(Fractalium::Image &&other) noexcept
  * @brief Combine l'image courante avec une autre image
  * @param image
  */
-void Fractalium::Image::merge(Fractalium::Image &image)
-{
-    if (width() != image.width() || height() != image.height())
-    {
+void Fractalium::Image::merge(Fractalium::Image &image) {
+    if (width() != image.width() || height() != image.height()) {
         std::cout << boost::mpi::communicator().rank() << std::endl;
         throw std::invalid_argument("Images must have the same size");
     }
 
-    for (int i = 0; i < width(); ++i)
-    {
-        for (int j = 0; j < height(); ++j)
-        {
+    for (int i = 0; i < width(); ++i) {
+        for (int j = 0; j < height(); ++j) {
             if (image._image[i][j] != -1)
                 _image[i][j] = image._image[i][j];
         }
@@ -93,10 +84,8 @@ void Fractalium::Image::merge(Fractalium::Image &image)
  * @param other
  * @return Image&
  */
-Fractalium::Image &Fractalium::Image::operator=(const Fractalium::Image &other)
-{
-    if (this != &other)
-    {
+Fractalium::Image &Fractalium::Image::operator=(const Fractalium::Image &other) {
+    if (this != &other) {
         _image = other._image;
         _width = other._width;
         _height = other._height;

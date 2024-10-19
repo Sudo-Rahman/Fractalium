@@ -7,8 +7,7 @@
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-namespace Fractalium
-{
+namespace Fractalium {
     typedef boost::multiprecision::cpp_dec_float_100 Double;
 }
 

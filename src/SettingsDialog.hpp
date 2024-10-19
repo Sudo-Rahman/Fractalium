@@ -12,7 +12,7 @@
 
 
 class SettingsDialog : public QDialog {
-Q_OBJECT
+    Q_OBJECT
 
 public:
 

@@ -14,8 +14,7 @@
 #include <boost/signals2.hpp>
 
 
-namespace Fractalium
-{
+namespace Fractalium {
 
     using Fractalium::Double;
 
@@ -24,8 +23,7 @@ namespace Fractalium
 
     public:
 
-        MPIStruct(const MPIStruct &aStruct)
-        {
+        MPIStruct(const MPIStruct &aStruct) {
             start_x = aStruct.start_x;
             end_x = aStruct.end_x;
             start_y = aStruct.start_y;
@@ -61,8 +59,7 @@ namespace Fractalium
                   uint16_t width, uint16_t height, int iterations, Double step_coord, Fractal fractal) :
                 start_x(start_x), end_x(end_x), start_y(start_y), end_y(end_y), offset_x(offset_x),
                 offset_y(offset_y), width(width), height(height), iterations(iterations), step_coord(step_coord),
-                fractal(fractal)
-        {}
+                fractal(fractal) {}
 
 
         MPIStruct() = default;
@@ -72,8 +69,7 @@ namespace Fractalium
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive &ar, const unsigned int version)
-        {
+        void serialize(Archive &ar, const unsigned int version) {
             ar & start_x;
             ar & end_x;
             ar & start_y;
