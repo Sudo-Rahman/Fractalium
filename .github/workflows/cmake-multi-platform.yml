@@ -1,11 +1,6 @@
-# This workflow builds on Linux and creates a release for the GitHub repository.
-name: Build and Release for Linux
+name: Build and Release Fractalium For Linux
 
 on:
-  push:
-    branches: [ "test" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       fractalium-version:
@@ -102,4 +97,4 @@ jobs:
           files: |
             ${{ github.workspace }}/project-release.tar.gz
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
