@@ -9,11 +9,10 @@
 #include <QLabel>
 #include <QRubberBand>
 
-namespace Fractalium
-{
+namespace Fractalium {
 
     class FractalWidget : public QLabel {
-    Q_OBJECT
+        Q_OBJECT
 
         bool _rubber_band_selection = false;
 
@@ -33,15 +32,14 @@ namespace Fractalium
 
         void setFractal(const QImage &image);
 
-        void disableSelection()
-        { _selection_enabled = false; }
+        void disableSelection() { _selection_enabled = false; }
 
-        void enableSelection()
-        { _selection_enabled = true; }
+        void enableSelection() { _selection_enabled = true; }
 
-    signals:
+        signals:
 
-        void newSelection(const QPoint &, const QPoint &);
+                void newSelection(
+        const QPoint &, const QPoint &);
 
     protected:
         void mousePressEvent(QMouseEvent *event) override;

@@ -12,8 +12,7 @@ using namespace Fractalium;
  * @brief Constructeur de la classe FractalWidget
  * @param parent Le widget parent
  */
-FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent)
-{
+FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent) {
     _rubber_band = new QRubberBand(QRubberBand::Rectangle, this);
     _selection_enabled = false;
 }
@@ -22,8 +21,7 @@ FractalWidget::FractalWidget(QWidget *parent) : QLabel(parent)
  * @brief Evènement de pression de la souris, permet de définir la zone de sélection de la fractale à afficher
  * @param event
  */
-void FractalWidget::mousePressEvent(QMouseEvent *event)
-{
+void FractalWidget::mousePressEvent(QMouseEvent *event) {
     if (!_selection_enabled)
         return;
     _rubber_band_selection = true;
@@ -34,8 +32,7 @@ void FractalWidget::mousePressEvent(QMouseEvent *event)
  * @brief Permet de définir la zone de sélection pour zoomer dans la fractale
  * @param event L'évènement de relâchement de la souris
  */
-void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
-{
+void FractalWidget::mouseReleaseEvent(QMouseEvent *event) {
     if (!_rubber_band_selection)
         return;
     _rubber_band_selection = false;
@@ -62,8 +59,7 @@ void FractalWidget::mouseReleaseEvent(QMouseEvent *event)
  * @brief Dessine le rectangle de sélection sur la fractale
  * @param event L'évènement de déplacement de la souris
  */
-void FractalWidget::mouseMoveEvent(QMouseEvent *event)
-{
+void FractalWidget::mouseMoveEvent(QMouseEvent *event) {
     if (!_rubber_band_selection)
         return;
     _rubber_band->setGeometry(QRect(_start_point, event->pos()).normalized());
@@ -74,8 +70,7 @@ void FractalWidget::mouseMoveEvent(QMouseEvent *event)
  * @brief Permet de définir l'image de la fractale à afficher
  * @param pixmap L'image de la fractale à afficher
  */
-void FractalWidget::setPixmap(const QPixmap &pixmap)
-{
+void FractalWidget::setPixmap(const QPixmap &pixmap) {
     QLabel::setPixmap(pixmap);
 }
 
@@ -83,8 +78,7 @@ void FractalWidget::setPixmap(const QPixmap &pixmap)
  * @brief Permet de définir l'image de la fractale à afficher
  * @param image L'image de la fractale à afficher
  */
-void FractalWidget::setFractal(const QImage &image)
-{
+void FractalWidget::setFractal(const QImage &image) {
     setPixmap(QPixmap::fromImage(image));
 }
 

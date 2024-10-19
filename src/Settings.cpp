@@ -21,8 +21,7 @@ bool Settings::IS_CRASHED = false;
 const std::string Settings::GITHUB_URL = "https://github.com/Sudo-Rahman/Fractalium";
 Settings::AreaAlgorithmType Settings::AREA_ALGORITHM_TYPE = Settings::AreaAlgorithmType::COLLUMNS;
 
-void Settings::saveSettings()
-{
+void Settings::saveSettings() {
     QSettings settings;
     settings.setValue("display_size_width", DISPLAY_SIZE_WIDTH);
     settings.setValue("display_size_height", DISPLAY_SIZE_HEIGHT);
@@ -37,8 +36,7 @@ void Settings::saveSettings()
 /**
  * @brief Fonction qui initialise les paramètres de l'application à partir des paramètres sauvegardés dans le fichier de configuration de l'application
  */
-void Settings::init()
-{
+void Settings::init() {
     QCoreApplication::setOrganizationName("Fractalium Inc.");
     QCoreApplication::setApplicationName("Fractalium");
 
@@ -49,7 +47,8 @@ void Settings::init()
     AUTO_SNAPSHOTS = settings.value("auto_snapshots", AUTO_SNAPSHOTS).toBool();
     SAVE_PATH = settings.value("save_path", QString::fromStdString(SAVE_PATH)).toString().toStdString();
     IS_CRASHED = settings.value("is_crashed", IS_CRASHED).toBool();
-    AREA_ALGORITHM_TYPE = static_cast<AreaAlgorithmType>(settings.value("AREA_ALGORITHM_TYPE", AREA_ALGORITHM_TYPE).toInt());
+    AREA_ALGORITHM_TYPE = static_cast<AreaAlgorithmType>(settings.value("AREA_ALGORITHM_TYPE",
+                                                                        AREA_ALGORITHM_TYPE).toInt());
 
 }
 
@@ -57,8 +56,7 @@ void Settings::init()
 /**
  * @brief Fonction qui permet de réinitialiser les paramètres de l'application
  */
-void Settings::resetCrash()
-{
+void Settings::resetCrash() {
     IS_CRASHED = false;
     QSettings settings;
     settings.setValue("is_crashed", false);
@@ -67,8 +65,7 @@ void Settings::resetCrash()
 /**
  * @brief Fonction qui permet de définir que l'application a crashé
  */
-void Settings::setCrash()
-{
+void Settings::setCrash() {
     IS_CRASHED = true;
     QSettings settings;
     settings.setValue("is_crashed", true);

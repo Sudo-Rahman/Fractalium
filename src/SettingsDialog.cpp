@@ -22,8 +22,7 @@ using Fractalium::Settings;
  * @brief Constructeur de la classe SettingsDialog
  * @param parent Widget parent
  */
-SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
-{
+SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
 
     _size = QSize(Settings::DISPLAY_SIZE_WIDTH, Settings::DISPLAY_SIZE_HEIGHT);
 
@@ -46,8 +45,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
  * @brief Fonction d'initialisation de l'interface graphique
 
  */
-void SettingsDialog::initUi()
-{
+void SettingsDialog::initUi() {
     initResizeUi();
     initIterationsUi();
     initAutoSnapshotsUi();
@@ -64,8 +62,7 @@ void SettingsDialog::initUi()
     save->setDefault(true);
     _layout->addWidget(save, Qt::AlignBottom | Qt::AlignHCenter);
 
-    connect(save, &QPushButton::clicked, this, [this]
-    {
+    connect(save, &QPushButton::clicked, this, [this] {
         Settings::DISPLAY_SIZE_WIDTH = _size.width();
         Settings::DISPLAY_SIZE_HEIGHT = _size.height();
         Settings::ITERATIONS = _iterations;
@@ -81,8 +78,7 @@ void SettingsDialog::initUi()
 /**
  * @brief Fonction d'initialisation de l'interface graphique pour le redimensionnement de la fenêtre
  */
-void SettingsDialog::initResizeUi()
-{
+void SettingsDialog::initResizeUi() {
 // Resize
     auto resize = new QGroupBox("Redimensionner la fenêtre principale", this);
 
@@ -94,8 +90,7 @@ void SettingsDialog::initResizeUi()
     width->setValue(Settings::DISPLAY_SIZE_WIDTH);
     resize_layout->addRow("width", width);
 
-    connect(width, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val)
-    {
+    connect(width, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val) {
         _size.setWidth(val);
     });
 
@@ -105,8 +100,7 @@ void SettingsDialog::initResizeUi()
     height->setValue(Settings::DISPLAY_SIZE_HEIGHT);
     resize_layout->addRow("height", height);
 
-    connect(height, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val)
-    {
+    connect(height, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val) {
         _size.setHeight(val);
     });
 
@@ -117,8 +111,7 @@ void SettingsDialog::initResizeUi()
  * @brief Fonction d'initialisation de l'interface graphique pour le nombre d'itérations
 
  */
-void SettingsDialog::initIterationsUi()
-{
+void SettingsDialog::initIterationsUi() {
     // Iterations
     auto iterations = new QGroupBox("Nombre d'itérations", this);
 
@@ -136,15 +129,13 @@ void SettingsDialog::initIterationsUi()
     iteration_spin->setRange(10, max);
 
 
-    connect(iteration, &QSlider::valueChanged, this, [=, this](int val)
-    {
+    connect(iteration, &QSlider::valueChanged, this, [=, this](int val) {
         label_current->setText("value : " + QString::number(val));
         iteration_spin->setValue(val);
         _iterations = val;
     });
 
-    connect(iteration_spin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this](int val)
-    {
+    connect(iteration_spin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=, this](int val) {
         label_current->setText("value : " + QString::number(val));
         iteration->setValue(val);
         _iterations = val;
@@ -166,8 +157,7 @@ void SettingsDialog::initIterationsUi()
  * @brief Fonction d'initialisation de l'interface graphique pour les instantanés automatiques
 
  */
-void SettingsDialog::initAutoSnapshotsUi()
-{
+void SettingsDialog::initAutoSnapshotsUi() {
     // AutoSnapshots
     auto auto_snapshots = new QGroupBox("Instantanés automatiques", this);
 
@@ -181,8 +171,7 @@ void SettingsDialog::initAutoSnapshotsUi()
     auto_snapshots_check->setChecked(Settings::AUTO_SNAPSHOTS);
     auto_snapshots_layout->addWidget(auto_snapshots_check);
 
-    connect(auto_snapshots_check, &QCheckBox::stateChanged, this, [this](int state)
-    {
+    connect(auto_snapshots_check, &QCheckBox::stateChanged, this, [this](int state) {
         _auto_snapshots = state == Qt::Checked;
     });
 
@@ -198,8 +187,7 @@ void SettingsDialog::initAutoSnapshotsUi()
     auto auto_snapshots_path_button = new QPushButton("Changer", this);
     auto_snapshots_path_layout->addWidget(auto_snapshots_path_button);
 
-    connect(auto_snapshots_path_button, &QPushButton::clicked, this, [this, auto_snapshots_path]
-    {
+    connect(auto_snapshots_path_button, &QPushButton::clicked, this, [this, auto_snapshots_path] {
         QString path = QFileDialog::getExistingDirectory(this, tr("Changer le chemin de sauvegarde"),
                                                          QDir::homePath(),
                                                          QFileDialog::ShowDirsOnly
@@ -213,8 +201,7 @@ void SettingsDialog::initAutoSnapshotsUi()
     _layout->addWidget(auto_snapshots);
 }
 
-void SettingsDialog::initAreaAlgorithmTypeUi()
-{
+void SettingsDialog::initAreaAlgorithmTypeUi() {
     auto AREA_ALGORITHM_TYPE = new QGroupBox("Algorithme de calcul de zone", this);
 
     auto AREA_ALGORITHM_TYPE_layout = new QVBoxLayout(AREA_ALGORITHM_TYPE);
@@ -227,12 +214,9 @@ void SettingsDialog::initAreaAlgorithmTypeUi()
 
     auto description = new QLabel(this);
 
-    auto description_text = [this, description]
-    {
-        switch (area_algorithm_type)
-        {
-            case Settings::COLLUMNS:
-            {
+    auto description_text = [this, description] {
+        switch (area_algorithm_type) {
+            case Settings::COLLUMNS: {
                 if (Settings::DISPLAY_SIZE_WIDTH < Settings::NODES)
                     description->setText(
                             "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale.\nAttention, le nombre de colonnes est supérieur au nombre de noeuds, il est donc possible que certains noeuds ne calculent aucune colonne de pixels.");
@@ -241,9 +225,8 @@ void SettingsDialog::initAreaAlgorithmTypeUi()
                             "Colonnes : Chaque noeud enfant calculera une colonne de pixels de l'image fractale");
             }
                 break;
-            case Settings::SQUARES:
-            {
-                if(Settings::NODES < 50)
+            case Settings::SQUARES: {
+                if (Settings::NODES < 50)
                     description->setText(
                             "Carrés : Chaque noeud enfant calculera un carré de pixels de l'image fractale.\nAttention, le nombre de noeuds est faible pour ce mode de calcul, il est donc possible que certaines zones de l'image ne soient pas calculées.");
                 else
@@ -256,8 +239,7 @@ void SettingsDialog::initAreaAlgorithmTypeUi()
     description_text();
 
     connect(AREA_ALGORITHM_TYPE_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            [description_text, this](int index)
-            {
+            [description_text, this](int index) {
                 area_algorithm_type = static_cast<Settings::AreaAlgorithmType>(index);
                 description_text();
 

@@ -10,7 +10,7 @@
 #include <History.hpp>
 
 class SnapshotDialog : public QDialog {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit SnapshotDialog(Fractalium::SnapshotHistory &snapshotHistory, QWidget *parent);
@@ -21,8 +21,7 @@ public:
         None
     };
 
-    [[nodiscard]] const Return &returnType() const
-    {
+    [[nodiscard]] const Return &returnType() const {
         return _return;
     }
 

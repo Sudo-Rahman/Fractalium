@@ -7,8 +7,7 @@ using namespace Fractalium;
  * @param  r: partie réelle du nombre complexe
  * @param  i: partie imaginaire du nombre complexe
  */
-Complex::Complex(Double r, Double i)
-{
+Complex::Complex(Double r, Double i) {
     this->real = std::move(r);
     this->imag = std::move(i);
 }
@@ -16,8 +15,7 @@ Complex::Complex(Double r, Double i)
 /**
  * @brief  Constructeur par defaut sans paramètres
  */
-Complex::Complex()
-{
+Complex::Complex() {
     this->real = 0;
     this->imag = 0;
 }
@@ -26,8 +24,7 @@ Complex::Complex()
  * @brief  Retourne le module du nombre complexe
  * @return Double
  */
-Double Complex::norm() const
-{
+Double Complex::norm() const {
     return sqrt(real * real + imag * imag);
 }
 
@@ -36,10 +33,8 @@ Double Complex::norm() const
  * @return Complex
 
  */
-Complex &Complex::operator=(const Complex &obj)
-{
-    if (this != &obj)
-    { // Vérifier l'auto-affectation
+Complex &Complex::operator=(const Complex &obj) {
+    if (this != &obj) { // Vérifier l'auto-affectation
         real = obj.real;
         imag = obj.imag;
     }
@@ -51,8 +46,7 @@ Complex &Complex::operator=(const Complex &obj)
  * @param obj  Nombre complexe à ajouter
  * @return  Complex
  */
-Complex Complex::operator+(Complex const &obj) const
-{
+Complex Complex::operator+(Complex const &obj) const {
     return {real + obj.real, imag + obj.imag};
 }
 
@@ -61,8 +55,7 @@ Complex Complex::operator+(Complex const &obj) const
  * @param obj  Nombre complexe à soustraire
  * @return  Complex
  */
-Complex Complex::operator-(Complex const &obj) const
-{
+Complex Complex::operator-(Complex const &obj) const {
     return {real - obj.real, imag - obj.imag};
 }
 
@@ -71,8 +64,7 @@ Complex Complex::operator-(Complex const &obj) const
  * @param obj  Nombre complexe à multiplier
  * @return  Complex
  */
-Complex Complex::operator*(Complex const &obj) const
-{
+Complex Complex::operator*(Complex const &obj) const {
     return {real * obj.real - imag * obj.imag, real * obj.imag + imag * obj.real};
 }
 
@@ -82,8 +74,7 @@ Complex Complex::operator*(Complex const &obj) const
  * @param obj  Nombre complexe à diviser
  * @return  Complex
  */
-Complex Complex::operator/(Complex const &obj) const
-{
+Complex Complex::operator/(Complex const &obj) const {
     return {(real * obj.real + imag * obj.imag) / (obj.real * obj.real + obj.imag * obj.imag),
             (imag * obj.real - real * obj.imag) / (obj.real * obj.real + obj.imag * obj.imag)};
 }

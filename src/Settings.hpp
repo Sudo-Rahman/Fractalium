@@ -9,8 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace Fractalium
-{
+namespace Fractalium {
     struct Settings {
 
         static uint16_t DISPLAY_SIZE_WIDTH;
@@ -24,9 +23,9 @@ namespace Fractalium
         static std::string SAVE_PATH;
 
         static bool IS_CRASHED;
-        const static std::string CRASH_SNAP_PATH ;
+        const static std::string CRASH_SNAP_PATH;
 
-        enum  AreaAlgorithmType : uint8_t {
+        enum AreaAlgorithmType : uint8_t {
             COLLUMNS,
             SQUARES,
         };

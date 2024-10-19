@@ -39,9 +39,11 @@ architecture distribuée.
 
 ## Compatibilité
 
+<div align="center">
 <img src="https://img.shields.io/badge/OS-MacOS-informational?style=flat&logo=apple&logoColor=white&color=2bbc8a" alt="MacOS" />
 <img src="https://img.shields.io/badge/OS-Linux-informational?style=flat&logo=linux&logoColor=white&color=2bbc8a" alt="Linux" />
 <img src="https://img.shields.io/badge/OS-Windows-informational?style=flat&logo=windows&logoColor=white&color=2bbc8a" alt="Windows" />
+</div>
 
 ## Démarrage
 
@@ -89,7 +91,8 @@ https://github.com/Sudo-Rahman/Fractalium/assets/85690773/1ca63c2c-5538-4362-802
 
 ## Instantané
 
-Importer l'instatané sample.fractalium dans le programme et visualiser pas moins de 10 zoom sur l'ensemble de Mandelbrot.
+Importer l'instatané sample.fractalium dans le programme et visualiser pas moins de 10 zoom sur l'ensemble de
+Mandelbrot.
 
 ## Auteurs
 
